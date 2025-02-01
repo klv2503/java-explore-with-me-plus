@@ -26,7 +26,7 @@ services:
 
   main-service:
     build: main-service
-    container_name: main-service
+    container_name: ewm-service
     ports:
       - "8080:8080"
     environment:
