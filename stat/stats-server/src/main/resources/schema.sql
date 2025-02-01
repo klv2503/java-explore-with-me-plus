@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS endpoint_hits
+CREATE TABLE IF NOT EXISTS endpoint_hit
 (
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
     app       VARCHAR(255) NOT NULL,
