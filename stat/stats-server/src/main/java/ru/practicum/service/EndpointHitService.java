@@ -41,7 +41,7 @@ public class EndpointHitService {
     public Collection<ReadEndpointHitDto> getHits(LocalDateTime start, LocalDateTime end,
                                                   Optional<List<String>> uris, boolean unique) {
         Collection<ReadEndpointHitDto> hits = endpointHitRepository.get(start, end, uris, unique).stream()
-                .sorted(Comparator.comparingInt(ReadEndpointHitDto::getHits)).toList();
+                .sorted(Comparator.comparingInt(ReadEndpointHitDto::getHits)).toList().reversed();
 
         return hits;
     }
