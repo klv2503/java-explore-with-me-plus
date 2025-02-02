@@ -45,7 +45,7 @@ public class EndpointHitRepository {
         sql.append("SELECT ");
 
         if (unique) {
-            sql.append(" DISTINCT ON (ip) ");
+            sql.append(" DISTINCT ip, ");
         }
 
         params.addValue("start", start);
