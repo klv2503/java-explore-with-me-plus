@@ -51,7 +51,8 @@ public class EndpointHitRepository {
         params.addValue("start", start);
         params.addValue("end", end);
 
-        sql.append("app, uri, COUNT(id) as count FROM endpoint_hit WHERE timestamp BETWEEN :start AND :end GROUP BY app, uri");
+        sql.append("app, uri, COUNT(id) as count FROM endpoint_hit WHERE timestamp BETWEEN :start AND :end " +
+                "GROUP BY app, uri");
 
 
         if (mayBeUris.isPresent()) {
@@ -65,6 +66,7 @@ public class EndpointHitRepository {
             params.addValue("uris", uris);
             sql.append(" HAVING uri IN (:uris)");
         }
+        sql.append(" ORDER BY count DESC");
 
         return jdbc.query(sql.toString(), params, mapper);
     }
