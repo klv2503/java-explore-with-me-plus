@@ -17,14 +17,11 @@ import java.util.Optional;
 
 @Repository
 public class EndpointHitRepository {
-
-    private final JdbcTemplate jdbcTemplate;
     private final RowMapper<ReadEndpointHitDto> mapper;
     private final NamedParameterJdbcOperations jdbc;
 
     @Autowired
     public EndpointHitRepository(JdbcTemplate jdbcTemplate, RowMapper<ReadEndpointHitDto> mapper, NamedParameterJdbcOperations jdbc) {
-        this.jdbcTemplate = jdbcTemplate;
         this.mapper = mapper;
         this.jdbc = jdbc;
     }
@@ -38,13 +35,7 @@ public class EndpointHitRepository {
         params.addValue("ip", endpointHit.getIp());
         params.addValue("timestamp", Timestamp.valueOf(endpointHit.getTimestamp()));
 
-//        jdbcTemplate.update(sql,
-//                endpointHit.getApp(),
-//                endpointHit.getUri(),
-//                endpointHit.getIp(),
-//                Timestamp.valueOf(endpointHit.getTimestamp()));
-
-       jdbc.update(sql, params);
+        jdbc.update(sql, params);
     }
 
     public Collection<ReadEndpointHitDto> get(LocalDateTime start, LocalDateTime end, Optional<List<String>> mayBeUris,
@@ -55,13 +46,13 @@ public class EndpointHitRepository {
         sql.append("SELECT ");
 
         if (unique) {
-            sql.append(" DISTINCT(ip) ");
+            sql.append(" DISTINCT ON (ip) ");
         }
 
         params.addValue("start", start);
         params.addValue("end", end);
 
-        sql.append("app, COUNT(id) as count, uri FROM endpoint_hit GROUP BY app, uri, timestamp HAVING timestamp BETWEEN :start AND :end");
+        sql.append("app, uri, COUNT(id) as count FROM endpoint_hit WHERE timestamp BETWEEN :start AND :end GROUP BY app, uri");
 
 
         if (mayBeUris.isPresent()) {
@@ -73,7 +64,7 @@ public class EndpointHitRepository {
             }
 
             params.addValue("uris", uris);
-            sql.append(" AND uri IN (").append(urisString).append(")");
+            sql.append(" HAVING uri IN (:uris)");
         }
 
         return jdbc.query(sql.toString(), params, mapper);

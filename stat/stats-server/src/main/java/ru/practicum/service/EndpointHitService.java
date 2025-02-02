@@ -8,7 +8,6 @@ import ru.practicum.dto.ReadEndpointHitDto;
 import ru.practicum.model.EndpointHit;
 import ru.practicum.repository.EndpointHitRepository;
 
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -31,8 +30,8 @@ public class EndpointHitService {
         endpointHit.setApp(endpointHitDto.getApp());
         endpointHit.setUri(endpointHitDto.getUri());
         endpointHit.setIp(endpointHitDto.getIp());
-        endpointHit.setTimestamp(endpointHitDto.getTimestamp() != null 
-                ? endpointHitDto.getTimestamp() 
+        endpointHit.setTimestamp(endpointHitDto.getTimestamp() != null
+                ? endpointHitDto.getTimestamp()
                 : LocalDateTime.now());
 
         endpointHitRepository.save(endpointHit);
@@ -40,7 +39,6 @@ public class EndpointHitService {
 
     public Collection<ReadEndpointHitDto> getHits(LocalDateTime start, LocalDateTime end,
                                                   Optional<List<String>> uris, boolean unique) {
-
-    return endpointHitRepository.get(start, end, uris, unique);
+        return endpointHitRepository.get(start, end, uris, unique);
     }
 }
