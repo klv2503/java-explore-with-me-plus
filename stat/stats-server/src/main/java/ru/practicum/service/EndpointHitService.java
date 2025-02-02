@@ -1,5 +1,6 @@
 package ru.practicum.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class EndpointHitService {
@@ -40,6 +42,7 @@ public class EndpointHitService {
 
     public Collection<ReadEndpointHitDto> getHits(LocalDateTime start, LocalDateTime end,
                                                   Optional<List<String>> uris, boolean unique) {
+        log.info("Получен запрос на hits в unique {} и uris {}", unique, uris);
         Collection<ReadEndpointHitDto> hits = endpointHitRepository.get(start, end, uris, unique).stream()
                 .sorted(Comparator.comparingInt(ReadEndpointHitDto::getHits)).toList().reversed();
 

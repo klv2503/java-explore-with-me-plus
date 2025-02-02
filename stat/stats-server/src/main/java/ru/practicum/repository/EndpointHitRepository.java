@@ -52,7 +52,7 @@ public class EndpointHitRepository {
         params.addValue("end", end);
 
         sql.append("app, uri, COUNT(id) as count FROM endpoint_hit WHERE timestamp BETWEEN :start AND :end " +
-                "GROUP BY app, uri");
+                "GROUP BY app, uri, ip");
 
 
         if (mayBeUris.isPresent()) {
