@@ -1,5 +1,7 @@
 package ru.practicum.service;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,14 +12,9 @@ import ru.practicum.repository.EndpointHitRepository;
 import java.time.LocalDateTime;
 
 @Service
+@AllArgsConstructor
 public class EndpointHitService {
-
     private final EndpointHitRepository endpointHitRepository;
-
-    @Autowired
-    public EndpointHitService(EndpointHitRepository endpointHitRepository) {
-        this.endpointHitRepository = endpointHitRepository;
-    }
 
     @Transactional
     public void saveHit(CreateEndpointHitDto endpointHitDto) {
