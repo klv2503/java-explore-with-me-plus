@@ -34,15 +34,15 @@ public class StatsController {
 
     @GetMapping("/stats")
     public ResponseEntity<Collection<ReadEndpointHitDto>> getHits(@RequestParam
-                                                          @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                                                      LocalDateTime start,
+                                                                  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                                  LocalDateTime start,
                                                                   @RequestParam
                                                                   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                                                   LocalDateTime end,
                                                                   @RequestParam(required = false)
-                                                                      Optional<List<String>> uris,
+                                                                  Optional<List<String>> uris,
                                                                   @RequestParam(required = false, defaultValue = "false")
-                                                                      boolean unique) {
+                                                                  boolean unique) {
         return ResponseEntity.status(HttpStatus.OK).body(endpointHitService.getHits(start, end, uris, unique));
     }
 }

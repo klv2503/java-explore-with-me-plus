@@ -17,6 +17,6 @@ public class EndpointHitMapper implements RowMapper<ReadEndpointHitDto> {
         readEndpointHitDto.setUri(rs.getString("uri"));
         readEndpointHitDto.setHits(rs.getInt("count"));
 
-        return  readEndpointHitDto;
+        return readEndpointHitDto;
     }
 }

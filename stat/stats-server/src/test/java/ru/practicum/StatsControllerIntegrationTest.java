@@ -1,5 +1,6 @@
 package ru.practicum;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -10,9 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.CreateEndpointHitDto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,10 +36,10 @@ public class StatsControllerIntegrationTest {
                 "192.168.1.1",
                 LocalDateTime.now()
         );
-        
+
         mockMvc.perform(post("/hit")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
     }
 }
