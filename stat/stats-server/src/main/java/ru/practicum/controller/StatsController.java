@@ -12,7 +12,7 @@ import ru.practicum.dto.CreateEndpointHitDto;
 import ru.practicum.service.EndpointHitService;
 
 @RestController
-@RequestMapping("/stats")
+@RequestMapping("/")
 public class StatsController {
 
     private final EndpointHitService endpointHitService;
