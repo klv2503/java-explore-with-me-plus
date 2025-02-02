@@ -10,6 +10,7 @@ import ru.practicum.repository.EndpointHitRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,9 @@ public class EndpointHitService {
 
     public Collection<ReadEndpointHitDto> getHits(LocalDateTime start, LocalDateTime end,
                                                   Optional<List<String>> uris, boolean unique) {
-        return endpointHitRepository.get(start, end, uris, unique);
+        Collection<ReadEndpointHitDto> hits = endpointHitRepository.get(start, end, uris, unique).stream()
+                .sorted(Comparator.comparingInt(ReadEndpointHitDto::getHits)).toList();
+
+        return hits;
     }
 }

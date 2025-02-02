@@ -45,7 +45,7 @@ public class EndpointHitRepository {
         sql.append("SELECT ");
 
         if (unique) {
-            sql.append(" DISTINCT ip, ");
+            sql.append(" DISTINCT ON (ip) ");
         }
 
         params.addValue("start", start);
@@ -66,7 +66,6 @@ public class EndpointHitRepository {
             params.addValue("uris", uris);
             sql.append(" HAVING uri IN (:uris)");
         }
-        sql.append(" ORDER BY count DESC");
 
         return jdbc.query(sql.toString(), params, mapper);
     }
