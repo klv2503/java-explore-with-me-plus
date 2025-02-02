@@ -13,6 +13,7 @@ import ru.practicum.service.EndpointHitService;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/")
@@ -38,7 +39,8 @@ public class StatsController {
                                                                   @RequestParam
                                                                   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                                                   LocalDateTime end,
-                                                                  @RequestParam(required = false) List<String> uris,
+                                                                  @RequestParam(required = false)
+                                                                      Optional<List<String>> uris,
                                                                   @RequestParam(required = false, defaultValue = "false")
                                                                       boolean unique) {
         return ResponseEntity.status(HttpStatus.OK).body(endpointHitService.getHits(start, end, uris, unique));

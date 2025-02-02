@@ -8,9 +8,11 @@ import ru.practicum.dto.ReadEndpointHitDto;
 import ru.practicum.model.EndpointHit;
 import ru.practicum.repository.EndpointHitRepository;
 
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,7 +39,7 @@ public class EndpointHitService {
     }
 
     public Collection<ReadEndpointHitDto> getHits(LocalDateTime start, LocalDateTime end,
-                                                                  List<String> uris, boolean unique) {
+                                                  Optional<List<String>> uris, boolean unique) {
 
     return endpointHitRepository.get(start, end, uris, unique);
     }
