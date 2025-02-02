@@ -1,7 +1,6 @@
 package ru.practicum.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -21,7 +20,7 @@ public class EndpointHitRepository {
     private final NamedParameterJdbcOperations jdbc;
 
     @Autowired
-    public EndpointHitRepository(JdbcTemplate jdbcTemplate, RowMapper<ReadEndpointHitDto> mapper, NamedParameterJdbcOperations jdbc) {
+    public EndpointHitRepository(RowMapper<ReadEndpointHitDto> mapper, NamedParameterJdbcOperations jdbc) {
         this.mapper = mapper;
         this.jdbc = jdbc;
     }
