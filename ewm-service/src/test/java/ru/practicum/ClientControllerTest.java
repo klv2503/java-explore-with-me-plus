@@ -10,8 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.controller.ClientController;
 
 @ExtendWith(MockitoExtension.class)
-class EwmControllerTest {
-
+class ClientControllerTest {
     @Mock
     private ClientController clientController;
 
