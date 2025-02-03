@@ -1,5 +1,6 @@
 package ru.practicum.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Slf4j
 public class EndpointHitRepository {
     private final RowMapper<ReadEndpointHitDto> mapper;
     private final NamedParameterJdbcOperations jdbc;
@@ -45,15 +47,15 @@ public class EndpointHitRepository {
         sql.append("SELECT ");
 
         if (unique) {
-            sql.append(" DISTINCT ON (ip) ");
+            sql.append(" app, uri, COUNT(distinct ip) as count, ip FROM endpoint_hit WHERE timestamp BETWEEN :start AND :end " +
+                    "GROUP BY app, uri, ip");
+        } else {
+            sql.append(" app, uri, COUNT(id) as count, ip FROM endpoint_hit WHERE timestamp BETWEEN :start AND :end " +
+                    "GROUP BY app, uri, ip");
         }
 
         params.addValue("start", start);
         params.addValue("end", end);
-
-        sql.append("app, uri, COUNT(id) as count FROM endpoint_hit WHERE timestamp BETWEEN :start AND :end " +
-                "GROUP BY app, uri, ip");
-
 
         if (mayBeUris.isPresent()) {
             List<String> uris = mayBeUris.get();

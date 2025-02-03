@@ -1,11 +1,13 @@
 package ru.practicum;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.controller.StatsController;
 import ru.practicum.dto.ReadEndpointHitDto;
 import ru.practicum.service.EndpointHitService;
 
@@ -20,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(properties = "classpath:application-test.properties")
 @ExtendWith(SpringExtension.class)
 @Transactional(readOnly = true)
+@Slf4j
 public class EndpointHitServiceIntegrationTest {
 
     @Autowired
@@ -29,7 +32,7 @@ public class EndpointHitServiceIntegrationTest {
     LocalDateTime end = LocalDateTime.of(2022, 9, 6, 12, 0, 0);
 
     @Autowired
-    public EndpointHitServiceIntegrationTest(EndpointHitService endpointHitService) {
+    public EndpointHitServiceIntegrationTest(EndpointHitService endpointHitService, StatsController statsController) {
         this.endpointHitService = endpointHitService;
     }
 
@@ -73,7 +76,8 @@ public class EndpointHitServiceIntegrationTest {
                 Optional.of(uris), true);
 
         assertAll(
-                () -> assertEquals(1, dtoList.size())
+                () -> assertEquals(1, dtoList.size()),
+                () -> assertEquals(1, dtoList.stream().toList().getFirst().getHits())
         );
     }
 }
