@@ -13,16 +13,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserShortDto {
+public class NewUserRequest {
 
     @NotNull(message = "Field: name. Error: must not be blank. Value: null")
     @NotBlank(message = "Field: name. Error: must not be blank. Value: empty")
-    @Size(min = 2, max = 200, message = "Field: name. Error: length must be between 2 and 200 symbols")
+    @Size(min = 2, max = 250, message = "Field: name. Error: length must be between 2 and 250 symbols")
     private String name;
 
     @Email(message = "Field: email. Error: must be correct email.")
     @NotBlank(message = "Field: email. Error: must not be blank. Value: empty")
-    @Size(max = 50, message = "Field: email. Error: too long email, must be not longer as 50 symbols.")
+    @Size(min = 6, max = 254, message = "Field: email. Error: length must be between 6 and  254 symbols.")
     private String email;
 
 }

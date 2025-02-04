@@ -8,10 +8,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.users.dto.GetUsersDto;
+import ru.practicum.users.dto.NewUserRequest;
 import ru.practicum.users.dto.UserDto;
-import ru.practicum.users.dto.UserShortDto;
+import ru.practicum.users.mapper.NewUserRequestToUserMapper;
 import ru.practicum.users.mapper.UserToDtoMapper;
-import ru.practicum.users.mapper.UserToShortDtoMapper;
 import ru.practicum.users.model.User;
 import ru.practicum.users.repository.AdminUserRepository;
 
@@ -26,7 +26,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserToDtoMapper userToDtoMapper;
 
-    private final UserToShortDtoMapper userShortMapper;
+    private final NewUserRequestToUserMapper userShortMapper;
 
     @Override
     public List<UserDto> getUsers(GetUsersDto parameters) {
@@ -40,9 +40,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public UserDto addUser(UserShortDto shortUser) {
-        log.info("\nAdminUserService.addUser {}", shortUser);
-        User newUser = userShortMapper.mapUserShortDtoToUser(shortUser);
+    public UserDto addUser(NewUserRequest newUserRequest) {
+        log.info("\nAdminUserService.addUser {}", newUserRequest);
+        User newUser = userShortMapper.mapNewUserRequestToUser(newUserRequest);
         return userToDtoMapper.mapUserToUserDto(adminUserRepository.save(newUser));
     }
 

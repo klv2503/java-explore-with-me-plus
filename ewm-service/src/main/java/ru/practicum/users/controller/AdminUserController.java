@@ -9,8 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.users.dto.GetUsersDto;
+import ru.practicum.users.dto.NewUserRequest;
 import ru.practicum.users.dto.UserDto;
-import ru.practicum.users.dto.UserShortDto;
 import ru.practicum.users.service.AdminUserService;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class AdminUserController {
     private final AdminUserService adminUserService;
 
     @PostMapping
-    public ResponseEntity<UserDto> addUser(@RequestBody @Valid UserShortDto newUser) {
+    public ResponseEntity<UserDto> addUser(@RequestBody @Valid NewUserRequest newUser) {
         log.info("\nRequest for adding of new user {}", newUser);
         UserDto createdUser = adminUserService.addUser(newUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
