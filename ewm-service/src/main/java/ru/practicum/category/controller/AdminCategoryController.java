@@ -42,7 +42,6 @@ public class AdminCategoryController {
                                                       @RequestBody @Valid NewCategoryDto inputDto) {
         log.info("\nAccepted request for updating category {}", catId);
         CategoryDto catDto = new CategoryDto(catId, inputDto.getName());
-        ;
         return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateCategory(catDto));
     }
 
