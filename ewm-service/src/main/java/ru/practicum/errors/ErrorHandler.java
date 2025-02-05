@@ -54,7 +54,7 @@ public class ErrorHandler {
         String statusStr = HttpStatus.NOT_FOUND.value() + " "
                 + HttpStatus.NOT_FOUND.getReasonPhrase().replace(" ", "_");
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ApiError(statusStr, "Required object not exists in base", e));
+                .body(new ApiError(statusStr, "The required object was not found.", e));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -74,7 +74,7 @@ public class ErrorHandler {
         String statusStr = HttpStatus.CONFLICT.value() + " "
                 + HttpStatus.CONFLICT.getReasonPhrase().replace(" ", "_");
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ApiError(statusStr, "Email already exists in base", e));
+                .body(new ApiError(statusStr, "Integrity constraint has been violated.", e));
     }
 
     @ExceptionHandler
