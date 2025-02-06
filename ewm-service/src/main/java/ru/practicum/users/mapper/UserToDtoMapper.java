@@ -1,21 +1,34 @@
 package ru.practicum.users.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.stereotype.Component;
 import ru.practicum.users.dto.UserDto;
 import ru.practicum.users.model.User;
 
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public interface UserToDtoMapper {
+@Component
+public class UserToDtoMapper {
 
-    User mapUserDtoToUser(UserDto userDto);
+    public User mapUserDtoToUser(UserDto userDto) {
+        User user = new User();
+        if (!Strings.isBlank(userDto.getName()))
+            user.setName(userDto.getName());
+        if (!Strings.isBlank(userDto.getEmail()))
+            user.setEmail(userDto.getEmail());
+        return user;
+    }
 
-    UserDto mapUserToUserDto(User user);
+    public UserDto mapUserToUserDto(User user) {
+        return new UserDto(user.getId(), user.getName(), user.getEmail());
+    }
 
     //List<User> mapDtoListToUsersList(List<UserDto> userDtos);
 
-    List<UserDto> mapUsersListToDtoList(List<User> users);
+    public List<UserDto> mapUsersListToDtoList(List<User> users) {
+        return users.stream()
+                .map(this::mapUserToUserDto)
+                .toList();
+    }
 
 }
