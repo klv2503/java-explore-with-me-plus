@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class NewUserRequest {
-
     @NotNull(message = "Field: name. Error: must not be blank. Value: null")
     @NotBlank(message = "Field: name. Error: must not be blank. Value: empty")
     @Size(min = 2, max = 250, message = "Field: name. Error: length must be between 2 and 250 symbols")

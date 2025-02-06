@@ -9,17 +9,17 @@ import java.util.List;
 @Component
 public class CategoryDtoMapper {
 
-    public CategoryDto mapCategoryToDto(Category cat) {
+    public static CategoryDto mapCategoryToDto(Category cat) {
         return new CategoryDto(cat.getId(), cat.getName());
     }
 
-    public Category mapDtoToCategory(CategoryDto catDto) {
+    public static Category mapDtoToCategory(CategoryDto catDto) {
         return new Category(catDto.getId(), catDto.getName());
     }
 
-    public List<CategoryDto> mapCatListToDtoList(List<Category> cats) {
+    public static List<CategoryDto> mapCatListToDtoList(List<Category> cats) {
         return cats.stream()
-                .map(this::mapCategoryToDto)
+                .map(CategoryDtoMapper::mapCategoryToDto)
                 .toList();
     }
 }
