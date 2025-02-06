@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.users.model.User;
 
 @Entity
-@Table(name = "event")
+@Table(name = "events")
 @Data
 @NoArgsConstructor
 public class Event {
@@ -19,6 +19,7 @@ public class Event {
     @JoinColumn(name = "initiator_id", nullable = false)
     private User initiator;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EventState state;
 
