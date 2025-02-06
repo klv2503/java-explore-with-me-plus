@@ -1,14 +1,20 @@
 package ru.practicum.users.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.stereotype.Component;
 import ru.practicum.users.dto.NewUserRequest;
 import ru.practicum.users.model.User;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Component
+public class NewUserRequestToUserMapper {
 
-public interface NewUserRequestToUserMapper {
-
-    User mapNewUserRequestToUser(NewUserRequest newUserRequest);
+    public User mapNewUserRequestToUser(NewUserRequest newUserRequest) {
+        User user = new User();
+        if (!Strings.isBlank(newUserRequest.getName()))
+            user.setName(newUserRequest.getName());
+        if (!Strings.isBlank(newUserRequest.getEmail()))
+            user.setEmail(newUserRequest.getEmail());
+        return user;
+    }
 
 }
