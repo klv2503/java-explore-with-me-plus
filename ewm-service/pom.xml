@@ -91,7 +91,6 @@
             <version>1.6.0.Beta2</version>
             <scope>provided</scope>
         </dependency>
-
         <!--Для тестирования в памяти-->
         <dependency>
             <groupId>com.h2database</groupId>
