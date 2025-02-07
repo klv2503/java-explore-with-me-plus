@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS participation_request;
-DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS category;
 DROP TABLE IF EXISTS users;
 
