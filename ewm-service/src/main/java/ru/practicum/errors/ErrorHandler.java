@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -75,6 +76,29 @@ public class ErrorHandler {
                 + HttpStatus.CONFLICT.getReasonPhrase().replace(" ", "_");
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ApiError(statusStr, "Integrity constraint has been violated.", e));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
+        StackTraceElement sElem = e.getStackTrace()[0];
+        String className = sElem.getClassName();
+        String str = className.substring(className.lastIndexOf(".") + 1);
+        log.info("\nMethodArgumentTypeMismatchException error - Class: {}; Method: {}; Line: {}; \nMessage: {}",
+                str, sElem.getMethodName(), sElem.getLineNumber(), e.getMessage());
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+
+        String statusStr = HttpStatus.BAD_REQUEST.value() + " "
+                + HttpStatus.BAD_REQUEST.getReasonPhrase().replace(" ", "_");
+
+        String message = String.format("Некорректный параметр '%s': ожидается %s, но передано '%s'",
+                e.getName(), e.getRequiredType() != null ? e.getRequiredType().getSimpleName() : "unknown", e.getValue());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError(statusStr, message, e));
     }
 
     @ExceptionHandler

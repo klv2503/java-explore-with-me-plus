@@ -28,7 +28,4 @@ public class Event {
 
     @Column(nullable = false)
     private int participantLimit;
-
-    @Column(nullable = false)
-    private int confirmedRequests;
 }

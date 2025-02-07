@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS events (
        state              VARCHAR(50) NOT NULL,
        request_moderation BOOLEAN NOT NULL,
        participant_limit  INT NOT NULL,
-       confirmed_requests INT NOT NULL,
        FOREIGN KEY (initiator_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

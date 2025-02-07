@@ -1,6 +1,7 @@
 package ru.practicum.users.validation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventState;
@@ -13,21 +14,21 @@ public class ParticipationRequestValidator {
 
     private final ParticipationRequestRepository requestRepository;
 
-    public void validate(User user, Event event) {
+    public void validate(User user, Event event, long confirmedRequestsCount) {
         if (event.getInitiator().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("Event initiator cannot participate in their own event");
+            throw new DataIntegrityViolationException("Event initiator cannot participate in their own event");
         }
 
         if (event.getState() != EventState.PUBLISHED) {
-            throw new IllegalArgumentException("Cannot participate in an unpublished event");
+            throw new DataIntegrityViolationException("Cannot participate in an unpublished event");
         }
 
         if (requestRepository.existsByUserIdAndEventId(user.getId(), event.getId())) {
-            throw new IllegalStateException("User already has a participation request for this event");
+            throw new DataIntegrityViolationException("User already has a participation request for this event");
         }
 
-        if (event.getParticipantLimit() > 0 && event.getConfirmedRequests() >= event.getParticipantLimit()) {
-            throw new IllegalStateException("Event participant limit reached");
+        if (event.getParticipantLimit() > 0 && confirmedRequestsCount >= event.getParticipantLimit()) {
+            throw new DataIntegrityViolationException("Event participant limit reached");
         }
     }
 }

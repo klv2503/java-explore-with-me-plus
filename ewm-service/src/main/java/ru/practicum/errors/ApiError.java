@@ -21,7 +21,7 @@ public class ApiError {
         this.errors = acceptStackTrace(ex);
         this.message = ex.getMessage();
         this.reason = reason;
-        this.status = status;;
+        this.status = status;
         this.timestamp = LocalDateTime.now().format(FORMATTER);
     }
 

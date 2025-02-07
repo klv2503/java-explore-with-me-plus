@@ -44,8 +44,10 @@ public class ParticipationRequestService {
                 .orElseThrow(() -> new EntityNotFoundException("User with id=" + userId + " was not found"));
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event with id=" + eventId + " was not found"));
+        long confirmedRequestsCount = requestRepository
+                .countConfirmedRequestsByStatusAndEventId(RequestStatus.CONFIRMED, eventId);
 
-        participationRequestValidator.validate(user, event);
+        participationRequestValidator.validate(user, event, confirmedRequestsCount);
 
         ParticipationRequest request = new ParticipationRequest();
         request.setUser(user);

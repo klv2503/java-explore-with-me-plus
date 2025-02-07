@@ -20,11 +20,11 @@ public class ParticipationRequestDto {
 
     @NotNull
     @Positive
-    private Long userId;
+    private Long requester;
 
     @NotNull
     @Positive
-    private Long eventId;
+    private Long event;
 
     @NotNull
     private RequestStatus status;
