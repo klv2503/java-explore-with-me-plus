@@ -1,21 +1,17 @@
 package ru.practicum.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.SneakyThrows;
-import org.hibernate.query.sqm.EntityTypeException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.MainService;
-import ru.practicum.errors.ErrorHandler;
 import ru.practicum.users.controller.AdminUserController;
 import ru.practicum.users.dto.GetUsersDto;
 import ru.practicum.users.dto.NewUserRequest;
@@ -23,10 +19,8 @@ import ru.practicum.users.dto.UserDto;
 import ru.practicum.users.service.AdminUserService;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
