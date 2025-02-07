@@ -15,7 +15,7 @@ import ru.practicum.users.service.PrivateUserService;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/users/{userId}")
+@RequestMapping(path = "/users/{userId}/events")
 @Validated
 @Slf4j
 @RequiredArgsConstructor

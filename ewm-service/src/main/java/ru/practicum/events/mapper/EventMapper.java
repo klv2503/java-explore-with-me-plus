@@ -58,25 +58,25 @@ public class EventMapper {
         );
     }
 
-
     public static EventFullDto toEventFullDto(Event event, User user) {
-        return new EventFullDto(
-                event.getId(),
-                event.getAnnotation(),
-                CategoryDtoMapper.mapCategoryToDto(event.getCategory()),
-                event.getCreatedOn().toString(),
-                event.getDescription(),
-                event.getEventDate().toString(),
-                new UserShortDto(user.getId(), user.getName()),
-                event.getLocation(),
-                event.isPaid(),
-                event.getParticipantLimit(),
-                event.getPublishedOn().toString(),
-                event.isRequestModeration(),
-                State.PENDING,
-                event.getTitle(),
-                0
-        );
+        return EventFullDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
+                .confirmedRequests(0)
+                .eventDate(event.getEventDate().toString())
+                .initiator(new UserShortDto(user.getId(), user.getName()))
+                .paid(event.isPaid())
+                .title(event.getTitle())
+                .views(event.getViews())
+                .createdOn(event.getCreatedOn().toString())
+                .description(event.getDescription())
+                .location(event.getLocation())
+                .participantLimit(event.getParticipantLimit())
+                .publishedOn(event.getPublishedOn().toString())
+                .requestModeration(event.isRequestModeration())
+                .state(event.getState())
+                .build();
     }
 
     public static EventShortDto toEventShortDto(Event event) {
@@ -84,10 +84,12 @@ public class EventMapper {
                 event.getId(),
                 event.getAnnotation(),
                 CategoryDtoMapper.mapCategoryToDto(event.getCategory()),
+                event.getConfirmedRequests(),
                 event.getEventDate().toString(),
                 new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
                 event.isPaid(),
-                event.getTitle()
+                event.getTitle(),
+                event.getViews()
         );
     }
 }

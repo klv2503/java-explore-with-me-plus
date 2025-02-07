@@ -61,5 +61,6 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private State state;
 
+    @Column(name = "views")
     private int views;
 }

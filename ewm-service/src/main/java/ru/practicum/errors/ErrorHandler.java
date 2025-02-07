@@ -43,7 +43,7 @@ public class ErrorHandler {
         StackTraceElement sElem = e.getStackTrace()[0];
         String className = sElem.getClassName();
         String str = className.substring(className.lastIndexOf(".") + 1);
-        log.info("\nDataIntegrityViolationException error - Class: {}; Method: {}; Line: {}; \nMessage: {}",
+        log.info("\nEntityNotFoundException error - Class: {}; Method: {}; Line: {}; \nMessage: {}",
                 str, sElem.getMethodName(), sElem.getLineNumber(), e.getMessage());
 
         StringWriter sw = new StringWriter();

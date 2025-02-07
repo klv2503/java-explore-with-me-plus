@@ -12,7 +12,6 @@ import ru.practicum.events.model.Event;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.users.dto.GetUserEventsDto;
 import ru.practicum.users.model.User;
-import ru.practicum.users.repository.AdminUserRepository;
 
 import java.util.List;
 
@@ -21,11 +20,13 @@ import java.util.List;
 @Slf4j
 public class PrivateUserServiceImpl implements PrivateUserService {
     EventRepository eventRepository;
-    AdminUserRepository adminUserRepository;
+    //AdminUserRepository adminUserRepository;
+    AdminUserService adminUserService;
 
     @Override
     public List<EventShortDto> getUsersEvents(GetUserEventsDto dto) {
-        User user = adminUserRepository.findById(dto.getUserId()).orElseThrow();
+        //User user = adminUserRepository.findById(dto.getUserId()).orElseThrow();
+        User user = adminUserService.getUser(dto.getUserId());
         PageRequest page = PageRequest.of(dto.getFrom() > 0 ? dto.getFrom() / dto.getSize() : 0, dto.getSize());
         return eventRepository.findAllByInitiatorId(dto.getUserId(), page).stream()
                 .map(EventMapper::toEventShortDto)
@@ -34,7 +35,8 @@ public class PrivateUserServiceImpl implements PrivateUserService {
 
     @Override
     public EventFullDto addNewEvent(Long userId, NewEventDto eventDto) {
-        User user = adminUserRepository.findById(userId).orElseThrow();
+        //User user = adminUserRepository.findById(userId).orElseThrow();
+        User user = adminUserService.getUser(userId);
         Event event = EventMapper.dtoToEvent(eventDto, user);
 
         eventRepository.save(event);
