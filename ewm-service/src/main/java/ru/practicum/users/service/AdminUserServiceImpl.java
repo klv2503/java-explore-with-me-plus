@@ -53,7 +53,8 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     //используется для получения user при необходимости и проверок существования
-    private User getUser(Long id) {
+    @Override
+    public User getUser(long id) {
         return adminUserRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with " + id + " not found"));
     }
