@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.events.model.Location;
+import ru.practicum.events.validation.TimeNotEarly;
 
 @Data
 @NoArgsConstructor
@@ -32,9 +33,8 @@ public class NewEventDto {
     @Size(min = 70, max = 2000)
     private String description;
 
-    @NotNull
-    @NotBlank
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @TimeNotEarly(hours = 2, message = "Время не должно быть ранее чем через 2 часа.")
     private String eventDate;
 
     @NotNull
