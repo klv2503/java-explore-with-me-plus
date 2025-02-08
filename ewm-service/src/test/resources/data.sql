@@ -11,3 +11,18 @@ INSERT INTO users(name, email) VALUES
 ('user10', 'user10@user'),
 ('user11', 'user11@user'),
 ('user12', 'user12@user');
+
+INSERT INTO events(title, annotation, description, state) VALUES
+('title', 'annotation', 'description', 'state'),
+('title1', 'annotation2', 'description2', 'state2'),
+('title3', 'annotation3', 'description3', 'state3');
+
+INSERT INTO compilations(pinned, title) VALUES
+(false, 'compilation1'),
+(true, 'compilation2'),
+(true, 'compilation3');
+
+INSERT INTO compilation_events(compilation_id, event_id) VALUES
+(1, 1),
+(2, 1),
+(3, 2);
