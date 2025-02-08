@@ -47,7 +47,11 @@ public class ParticipationRequestService {
         long confirmedRequestsCount = requestRepository
                 .countConfirmedRequestsByStatusAndEventId(RequestStatus.CONFIRMED, eventId);
 
-        participationRequestValidator.validate(user, event, confirmedRequestsCount);
+        RuntimeException validationError =
+                participationRequestValidator.checkRequest(user, event, confirmedRequestsCount);
+
+        if (validationError != null)
+            throw validationError;
 
         ParticipationRequest request = new ParticipationRequest();
         request.setUser(user);
