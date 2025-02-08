@@ -24,7 +24,6 @@ public class ParticipationRequestService {
 
     private final ParticipationRequestRepository requestRepository;
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
 
     private final AdminUserService adminUserService;
 
@@ -40,8 +39,7 @@ public class ParticipationRequestService {
 
     @Transactional
     public ParticipationRequestDto addParticipationRequest(Long userId, Long eventId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User with id=" + userId + " was not found"));
+        User user = adminUserService.getUser(userId);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event with id=" + eventId + " was not found"));
         long confirmedRequestsCount = requestRepository
