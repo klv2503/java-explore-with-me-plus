@@ -9,7 +9,7 @@ import ru.practicum.event.repository.EventRepository;
 import ru.practicum.users.dto.ParticipationRequestDto;
 import ru.practicum.users.mapper.ParticipationRequestToDtoMapper;
 import ru.practicum.users.model.ParticipationRequest;
-import ru.practicum.users.model.RequestStatus;
+import ru.practicum.users.model.ParticipationRequestStatus;
 import ru.practicum.users.model.User;
 import ru.practicum.users.repository.ParticipationRequestRepository;
 import ru.practicum.users.repository.UserRepository;
@@ -26,12 +26,12 @@ public class ParticipationRequestService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
 
+    private final AdminUserService adminUserService;
+
     private final ParticipationRequestValidator participationRequestValidator;
 
     public List<ParticipationRequestDto> getUserRequests(Long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User with id=" + userId + " was not found"));
-
+        adminUserService.getUser(userId);
         return requestRepository.findByUserId(userId)
                 .stream()
                 .map(ParticipationRequestToDtoMapper::mapToDto)
@@ -45,7 +45,7 @@ public class ParticipationRequestService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event with id=" + eventId + " was not found"));
         long confirmedRequestsCount = requestRepository
-                .countConfirmedRequestsByStatusAndEventId(RequestStatus.CONFIRMED, eventId);
+                .countConfirmedRequestsByStatusAndEventId(ParticipationRequestStatus.CONFIRMED, eventId);
 
         RuntimeException validationError =
                 participationRequestValidator.checkRequest(user, event, confirmedRequestsCount);
@@ -56,7 +56,7 @@ public class ParticipationRequestService {
         ParticipationRequest request = new ParticipationRequest();
         request.setUser(user);
         request.setEvent(event);
-        request.setStatus(event.isRequestModeration() ? RequestStatus.PENDING : RequestStatus.CONFIRMED);
+        request.setStatus(event.isRequestModeration() ? ParticipationRequestStatus.PENDING : ParticipationRequestStatus.CONFIRMED);
         request.setCreated(LocalDateTime.now());
 
         ParticipationRequest savedRequest = requestRepository.save(request);
@@ -68,7 +68,7 @@ public class ParticipationRequestService {
         ParticipationRequest request = requestRepository.findByIdAndUserId(requestId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Request with id=" + requestId + " was not found"));
 
-        request.setStatus(RequestStatus.CANCELED);
+        request.setStatus(ParticipationRequestStatus.CANCELED);
         requestRepository.save(request);
 
         return ParticipationRequestToDtoMapper.mapToDto(request);

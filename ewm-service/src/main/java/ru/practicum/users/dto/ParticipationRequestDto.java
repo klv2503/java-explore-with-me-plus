@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.users.model.RequestStatus;
+import ru.practicum.users.model.ParticipationRequestStatus;
 
 import java.time.LocalDateTime;
 
@@ -27,7 +27,7 @@ public class ParticipationRequestDto {
     private Long event;
 
     @NotNull
-    private RequestStatus status;
+    private ParticipationRequestStatus status;
 
     @NotNull
     private LocalDateTime created;
