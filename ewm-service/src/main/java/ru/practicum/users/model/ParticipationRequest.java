@@ -3,7 +3,7 @@ package ru.practicum.users.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.event.model.Event;
+import ru.practicum.events.model.Event;
 
 import java.time.LocalDateTime;
 

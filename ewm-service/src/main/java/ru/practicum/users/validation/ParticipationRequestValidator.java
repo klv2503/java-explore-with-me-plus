@@ -1,10 +1,13 @@
 package ru.practicum.users.validation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
-import ru.practicum.event.model.Event;
-import ru.practicum.event.model.EventState;
+import ru.practicum.events.model.Event;
+import ru.practicum.events.model.State;
+import ru.practicum.users.errors.EventOwnerParticipationException;
+import ru.practicum.users.errors.EventParticipationLimitException;
+import ru.practicum.users.errors.NotPublishedEventParticipationException;
+import ru.practicum.users.errors.RepeatParticipationRequestException;
 import ru.practicum.users.model.User;
 import ru.practicum.users.repository.ParticipationRequestRepository;
 
@@ -16,19 +19,19 @@ public class ParticipationRequestValidator {
 
     public RuntimeException checkRequest(User user, Event event, long confirmedRequestsCount) {
         if (event.getInitiator().getId().equals(user.getId())) {
-            return new DataIntegrityViolationException("Event initiator cannot participate in their own event");
+            return new EventOwnerParticipationException("Event initiator cannot participate in their own event");
         }
 
-        if (event.getState() != EventState.PUBLISHED) {
-            return new DataIntegrityViolationException("Cannot participate in an unpublished event");
+        if (event.getState() != State.PUBLISHED) {
+            return new NotPublishedEventParticipationException("Cannot participate in an unpublished event");
         }
 
         if (requestRepository.existsByUserIdAndEventId(user.getId(), event.getId())) {
-            return new DataIntegrityViolationException("User already has a participation request for this event");
+            return new RepeatParticipationRequestException("User already has a participation request for this event");
         }
 
         if (event.getParticipantLimit() > 0 && confirmedRequestsCount >= event.getParticipantLimit()) {
-            return new DataIntegrityViolationException("Event participant limit reached");
+            return new EventParticipationLimitException("Event participant limit reached");
         }
 
         return null;
