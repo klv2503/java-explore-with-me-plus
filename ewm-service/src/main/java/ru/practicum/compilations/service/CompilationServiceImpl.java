@@ -73,7 +73,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void delete(Long compId) {
         log.info("Delete compilation with id {}", compId);
-        if(!compilationRepository.existsById(compId)) {
+        if (!compilationRepository.existsById(compId)) {
             throw new EntityNotFoundException("Compilation with id=" + compId +
                     " was not found");
         }

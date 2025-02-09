@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilations.dto.CompilationDto;
 import ru.practicum.compilations.dto.NewCompilationDto;
 import ru.practicum.compilations.dto.UpdateCompilationRequest;
-import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.service.CompilationService;
 
 @RestController
@@ -31,8 +30,8 @@ public class AdminCompilationController {
 
     @PatchMapping("/{compId}")
     public ResponseEntity<CompilationDto> update(@PathVariable @Min(value = 1, message = "ID must be positive")
-                                                  Long compId,
-            @RequestBody @Valid UpdateCompilationRequest updateCompilationRequest) {
+                                                 Long compId,
+                                                 @RequestBody @Valid UpdateCompilationRequest updateCompilationRequest) {
         log.info("Request for update of compilation with id {}", compId);
         return ResponseEntity.status(HttpStatus.OK).body(compilationService.update(compId, updateCompilationRequest));
     }
@@ -40,7 +39,7 @@ public class AdminCompilationController {
     @DeleteMapping("/{compId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable @Min(value = 1, message = "ID must be positive")
-                                                  Long compId) {
+                       Long compId) {
         log.info("Request for delete compilation with id {}", compId);
         compilationService.delete(compId);
     }
