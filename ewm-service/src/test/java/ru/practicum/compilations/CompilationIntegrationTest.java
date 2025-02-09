@@ -9,10 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.MainService;
+import ru.practicum.compilations.dto.CompilationDto;
 import ru.practicum.compilations.dto.Filter;
 import ru.practicum.compilations.dto.NewCompilationDto;
 import ru.practicum.compilations.dto.UpdateCompilationRequest;
-import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.compilations.service.CompilationService;
 
@@ -39,13 +39,12 @@ public class CompilationIntegrationTest {
     @Transactional
     public void addCompilationTest() {
         NewCompilationDto newCompilationDto = new NewCompilationDto(Set.of(1L, 2L), false, "Title");
-        Compilation compilation = compilationService.add(newCompilationDto);
+        CompilationDto compilation = compilationService.add(newCompilationDto);
 
         assertAll(
-                () -> assertEquals(newCompilationDto.getEvents(), compilation.getEvents()),
+                () -> assertEquals(newCompilationDto.getEvents().size(), compilation.getEvents().size()),
                 () -> assertEquals(newCompilationDto.getPinned(), compilation.getPinned()),
                 () -> assertEquals(newCompilationDto.getTitle(), compilation.getTitle()),
-                () -> assertEquals(2, compilation.getEvents().size()),
                 () -> assertNotNull(compilation.getId())
         );
     }
@@ -57,7 +56,7 @@ public class CompilationIntegrationTest {
                 null,
                 true,
                 null);
-        Compilation compilation = compilationService.update(1L, updateCompilationRequest);
+        CompilationDto compilation = compilationService.update(1L, updateCompilationRequest);
 
         assertAll(
                 () -> assertNotNull(compilation.getEvents()),
@@ -75,7 +74,7 @@ public class CompilationIntegrationTest {
                 "New title"
         );
 
-        Compilation compilation = compilationService.update(1L, updateCompilationRequest);
+        CompilationDto compilation = compilationService.update(1L, updateCompilationRequest);
 
         assertAll(
                 () -> assertNotNull(compilation.getEvents()),
@@ -97,11 +96,13 @@ public class CompilationIntegrationTest {
                 null
         );
 
-        Compilation compilation = compilationService.update(2L, updateCompilationRequest);
+        CompilationDto compilation = compilationService.update(2L, updateCompilationRequest);
+        List<Long> eventsId = compilation.getEvents().stream()
+                        .map(eventShortDto -> eventShortDto.getId()).toList();
 
         assertAll(
                 () -> assertEquals(1, compilation.getEvents().size()),
-                () -> assertTrue(compilation.getEvents().contains(2L))
+                () -> assertTrue(eventsId.contains(2L))
         );
     }
 
@@ -115,7 +116,7 @@ public class CompilationIntegrationTest {
 
     @Test
     public void getCompilationTest() {
-        Compilation compilation = compilationService.getById(1L);
+        CompilationDto compilation = compilationService.getById(1L);
 
         assertAll(
                 () -> assertEquals(1, compilation.getId()),
@@ -126,7 +127,7 @@ public class CompilationIntegrationTest {
     @Test
     public void getCompilationPinnedTrueTest() {
         Filter params = new Filter(true, 0, 10);
-        List<Compilation> compilationList = compilationService.get(params);
+        List<CompilationDto> compilationList = compilationService.get(params);
         List<Boolean> pinned = compilationList.stream().map(compilation -> compilation.getPinned()).toList();
 
         assertAll(
@@ -138,7 +139,7 @@ public class CompilationIntegrationTest {
     @Test
     public void getCompilationSizeTest() {
         Filter params = new Filter(false, 0, 2);
-        List<Compilation> compilationList = compilationService.get(params);
+        List<CompilationDto> compilationList = compilationService.get(params);
 
         assertEquals(2, compilationList.size());
     }
