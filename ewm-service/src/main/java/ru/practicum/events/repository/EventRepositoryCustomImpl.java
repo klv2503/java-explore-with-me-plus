@@ -25,6 +25,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         // Запрос для получения данных с пагинацией и сортировкой
         JPAQuery<Event> query = new JPAQuery<>(em)
                 .select(event)
+                .from(event)
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());

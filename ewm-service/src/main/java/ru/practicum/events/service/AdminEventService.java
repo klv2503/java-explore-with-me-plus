@@ -3,6 +3,7 @@ package ru.practicum.events.service;
 import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.UpdateEventAdminRequest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AdminEventService {
@@ -11,8 +12,8 @@ public interface AdminEventService {
             List<Long> users,
             List<String> states,
             List<Long> categories,
-            String rangeStart,
-            String rangeEnd,
+            LocalDateTime rangeStart,
+            LocalDateTime rangeEnd,
             int from,
             int size
     );

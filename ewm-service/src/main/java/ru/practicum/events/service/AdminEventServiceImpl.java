@@ -36,8 +36,8 @@ public class AdminEventServiceImpl implements AdminEventService {
             List<Long> users,
             List<String> states,
             List<Long> categories,
-            String rangeStart,
-            String rangeEnd,
+            LocalDateTime rangeStart,
+            LocalDateTime rangeEnd,
             int from,
             int size) {
 
@@ -63,14 +63,12 @@ public class AdminEventServiceImpl implements AdminEventService {
         }
 
         // Фильтрация по диапазону времени
-        if (rangeStart != null && !rangeStart.isEmpty()) {
-            LocalDateTime startDate = LocalDateTime.parse(rangeStart);
-            builder.and(event.eventDate.goe(startDate));
+        if (rangeStart != null) {
+            builder.and(event.eventDate.goe(rangeStart));
         }
 
-        if (rangeEnd != null && !rangeEnd.isEmpty()) {
-            LocalDateTime endDate = LocalDateTime.parse(rangeEnd);
-            builder.and(event.eventDate.loe(endDate));
+        if (rangeEnd != null) {
+            builder.and(event.eventDate.loe(rangeEnd));
         }
 
         // Пагинация
