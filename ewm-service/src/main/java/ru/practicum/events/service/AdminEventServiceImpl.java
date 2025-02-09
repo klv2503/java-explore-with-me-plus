@@ -1,8 +1,12 @@
 package ru.practicum.events.service;
 
+import com.querydsl.core.BooleanBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
@@ -11,11 +15,14 @@ import ru.practicum.events.dto.UpdateEventAdminRequest;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStateAction;
+import ru.practicum.events.model.QEvent;
 import ru.practicum.events.model.State;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.validation.AdminEventValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +40,49 @@ public class AdminEventServiceImpl implements AdminEventService {
             String rangeEnd,
             int from,
             int size) {
-        // Реализация метода
-        return null;
+
+        // Создаем объект QEvent для построения запроса
+        QEvent event = QEvent.event;
+
+        // Строим базовый запрос
+        BooleanBuilder builder = new BooleanBuilder();
+
+        // Фильтрация по пользователям
+        if (users != null && !users.isEmpty()) {
+            builder.and(event.initiator.id.in(users));
+        }
+
+        // Фильтрация по состояниям
+        if (states != null && !states.isEmpty()) {
+            builder.and(event.state.in(states.stream().map(State::valueOf).collect(Collectors.toList())));
+        }
+
+        // Фильтрация по категориям
+        if (categories != null && !categories.isEmpty()) {
+            builder.and(event.category.id.in(categories));
+        }
+
+        // Фильтрация по диапазону времени
+        if (rangeStart != null && !rangeStart.isEmpty()) {
+            LocalDateTime startDate = LocalDateTime.parse(rangeStart);
+            builder.and(event.eventDate.goe(startDate));
+        }
+
+        if (rangeEnd != null && !rangeEnd.isEmpty()) {
+            LocalDateTime endDate = LocalDateTime.parse(rangeEnd);
+            builder.and(event.eventDate.loe(endDate));
+        }
+
+        // Пагинация
+        Pageable pageable = PageRequest.of(from / size, size);
+
+        // Выполнение запроса
+        Page<Event> eventsPage = eventRepository.findAllWithBuilder(builder, pageable);
+
+        // Преобразуем сущности Event в EventFullDto
+        return eventsPage.getContent().stream()
+                .map(EventMapper::toEventFullDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -82,7 +130,7 @@ public class AdminEventServiceImpl implements AdminEventService {
         event = eventRepository.save(event);
 
         // 5. Преобразование в DTO и возврат
-        return EventMapper.toEventFullDto(event, event.getInitiator());
+        return EventMapper.toEventFullDto(event);
     }
 
     private void updateEventState(Event event, String stateAction) {

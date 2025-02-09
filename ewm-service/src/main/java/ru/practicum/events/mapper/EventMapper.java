@@ -80,6 +80,27 @@ public class EventMapper {
                 .build();
     }
 
+    public static EventFullDto toEventFullDto(Event event) {
+        return EventFullDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
+                .confirmedRequests(0)
+                .eventDate(event.getEventDate().toString())
+                .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
+                .paid(event.isPaid())
+                .title(event.getTitle())
+                .views(event.getViews())
+                .createdOn(event.getCreatedOn().toString())
+                .description(event.getDescription())
+                .location(event.getLocation())
+                .participantLimit(event.getParticipantLimit())
+                .publishedOn(event.getPublishedOn().toString())
+                .requestModeration(event.isRequestModeration())
+                .state(event.getState())
+                .build();
+    }
+
     public static EventShortDto toEventShortDto(Event event) {
         return EventShortDto.builder()
                 .id(event.getId())
