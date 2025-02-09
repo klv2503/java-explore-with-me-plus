@@ -2,6 +2,9 @@ package ru.practicum.config;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -18,7 +21,7 @@ public class StringToLocalDateTimeConverter implements Converter<String, LocalDa
         }
 
         try {
-            String decodedDate = source.replace("%20", " ").replace("%3A", ":");  // Декодируем URL-encoded символы
+            String decodedDate = URLDecoder.decode(source, StandardCharsets.UTF_8);
             return LocalDateTime.parse(decodedDate, FORMATTER);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format: " + source, e);

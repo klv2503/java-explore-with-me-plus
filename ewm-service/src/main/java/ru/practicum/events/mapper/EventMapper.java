@@ -86,7 +86,7 @@ public class EventMapper {
                 .annotation(event.getAnnotation())
                 .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
                 .confirmedRequests(0)
-                .eventDate(event.getEventDate().toString())
+                .eventDate(event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
                 .paid(event.isPaid())
                 .title(event.getTitle())
@@ -95,7 +95,7 @@ public class EventMapper {
                 .description(event.getDescription())
                 .location(event.getLocation())
                 .participantLimit(event.getParticipantLimit())
-                .publishedOn(event.getPublishedOn().toString())
+                .publishedOn(event.getPublishedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .requestModeration(event.isRequestModeration())
                 .state(event.getState())
                 .build();
