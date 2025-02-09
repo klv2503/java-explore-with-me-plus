@@ -109,10 +109,9 @@ public class CompilationServiceImpl implements CompilationService {
                 .flatMap(List::stream)
                 .collect(Collectors.toSet());
 
-        List<EventShortDto> eventShortDtoList = eventRepository.findAllById(eventsId).stream()
+        return eventRepository.findAllById(eventsId).stream()
                 .map(EventMapper::toEventShortDto)
                 .toList();
-        return eventShortDtoList;
     }
 
     private List<EventShortDto> getEventsListForDto(Compilation compilation) {
