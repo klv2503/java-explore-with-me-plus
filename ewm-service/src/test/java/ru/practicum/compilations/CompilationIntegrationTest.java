@@ -1,5 +1,6 @@
 package ru.practicum.compilations;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -112,6 +113,11 @@ public class CompilationIntegrationTest {
         compilationService.delete(3L);
 
         assertFalse(compilationRepository.existsById(3L));
+    }
+
+    @Test
+    public void deleteCompilationWithWrongIdTest() {
+        assertThrows(EntityNotFoundException.class, () -> compilationService.delete(1000L));
     }
 
     @Test
