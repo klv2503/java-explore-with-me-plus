@@ -29,6 +29,7 @@ public class PublicCompilationController {
         return ResponseEntity.status(HttpStatus.OK).body(compilationService.getById(compId));
     }
 
+    @GetMapping
     public ResponseEntity<List<CompilationDto>> get(@RequestParam(required = false, defaultValue = "false") Boolean pinned,
                                                     @RequestParam(required = false, defaultValue = "0") Integer from,
                                                     @RequestParam(required = false, defaultValue = "10") Integer size) {

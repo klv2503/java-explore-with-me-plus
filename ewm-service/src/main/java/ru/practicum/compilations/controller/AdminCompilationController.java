@@ -15,7 +15,7 @@ import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.service.CompilationService;
 
 @RestController
-@RequestMapping("/admin/compilation")
+@RequestMapping(path = "/admin/compilations")
 @Validated
 @Slf4j
 @RequiredArgsConstructor

@@ -30,7 +30,7 @@ public class NewEventDto {
 
     @NotNull
     @NotBlank
-    @Size(min = 70, max = 2000)
+    @Size(min = 70, max = 7000)
     private String description;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
