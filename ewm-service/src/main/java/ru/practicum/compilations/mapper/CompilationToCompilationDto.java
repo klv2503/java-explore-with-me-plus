@@ -6,12 +6,16 @@ import ru.practicum.compilations.dto.CompilationDto;
 import ru.practicum.compilations.model.Compilation;
 import ru.practicum.events.dto.EventShortDto;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @NoArgsConstructor
 public class CompilationToCompilationDto {
-    public static CompilationDto mapCompilationToCompilationDto(Compilation compilation, List<EventShortDto> events) {
+    public static CompilationDto mapCompilationToCompilationDto(Compilation compilation,
+                                                                List<EventShortDto> events) {
         return new CompilationDto(
                 events,
                 compilation.getId(),
@@ -20,18 +24,16 @@ public class CompilationToCompilationDto {
     }
 
     public static List<CompilationDto> mapToListCompilationDto(List<Compilation> compilationList,
-                                                               List<EventShortDto> events) {
+                                                               HashMap<Long, EventShortDto> events) {
         return compilationList.stream()
                 .map(compilation -> mapCompilationToCompilationDto(compilation,
-                        getEvents(compilation.getEvents().stream().toList(), events)))
+                        getEvents(compilation.getEvents(), events)))
                 .toList();
     }
 
     //вспомогательные методы
 
-    private static List<EventShortDto> getEvents(List<Long> ids, List<EventShortDto> eventShortDtoList) {
-        return eventShortDtoList.stream()
-                .filter(eventShortDto -> ids.contains(eventShortDto.getId()))
-                .toList();
+    private static List<EventShortDto> getEvents(Collection<Long> ids, HashMap<Long, EventShortDto> eventShortDtoList) {
+        return ids.stream().map(eventShortDtoList::get).toList();
     }
 }

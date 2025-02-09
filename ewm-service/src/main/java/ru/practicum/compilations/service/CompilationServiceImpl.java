@@ -17,8 +17,11 @@ import ru.practicum.events.dto.EventShortDto;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.repository.EventRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ru.practicum.compilations.mapper.CompilationToCompilationDto.mapCompilationToCompilationDto;
@@ -89,10 +92,7 @@ public class CompilationServiceImpl implements CompilationService {
         Page<Compilation> response = params.getPinned() ? compilationRepository.findAllByPinnedTrue(pageable) :
                 compilationRepository.findAll(pageable);
         List<Compilation> compilations = response.getContent().stream().toList();
-
-        List<EventShortDto> eventShortDtoList = getEventShortDtoForListDto(compilations);
-
-        return mapToListCompilationDto(compilations, eventShortDtoList);
+        return mapToListCompilationDto(compilations, getEventShortDtoForListDto(compilations));
     }
 
 
@@ -103,20 +103,21 @@ public class CompilationServiceImpl implements CompilationService {
                         " was not found"));
     }
 
-    private List<EventShortDto> getEventShortDtoForListDto(List<Compilation> compilations) {
+    private HashMap<Long, EventShortDto> getEventShortDtoForListDto(List<Compilation> compilations) {
         Set<Long> eventsId = compilations.stream()
                 .map(compilation -> compilation.getEvents().stream().toList())
                 .flatMap(List::stream)
                 .collect(Collectors.toSet());
 
-        return eventRepository.findAllById(eventsId).stream()
+        //спорный способ вернуть HashMap
+        return new HashMap<>(eventRepository.findAllById(eventsId).stream()
                 .map(EventMapper::toEventShortDto)
-                .toList();
+                .collect(Collectors.toMap(EventShortDto::getId, Function.identity())));
     }
 
     private List<EventShortDto> getEventsListForDto(Compilation compilation) {
         return eventRepository.findAllById(compilation.getEvents().stream().toList())
-                .stream().map(EventMapper::toEventShortDto).toList();
+                .stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
     }
 
 }
