@@ -16,10 +16,10 @@ public class AdminEventValidator {
             throw new ForbiddenActionException("Event start time must be at least 1 hour after publication.");
         }
 
-        boolean isPublishAction = EventStateAction.valueOf(updateRequest.getStateAction())
+        boolean isPublishAction = updateRequest.getStateAction()
                 .equals(EventStateAction.PUBLISH_EVENT);
-        boolean isRejectAction = EventStateAction.valueOf(updateRequest.getStateAction())
-                .equals(EventStateAction.PUBLISH_EVENT);
+        boolean isRejectAction = updateRequest.getStateAction()
+                .equals(EventStateAction.REJECT_EVENT);
 
         if (isPublishAction && !event.getState().equals(State.PENDING)) {
             throw new ForbiddenActionException("Cannot publish event. It must be in PENDING state.");

@@ -133,10 +133,10 @@ public class AdminEventServiceImpl implements AdminEventService {
         return EventMapper.toEventFullDto(event);
     }
 
-    private void updateEventState(Event event, String stateAction) {
-        if (EventStateAction.valueOf(stateAction).equals(EventStateAction.PUBLISH_EVENT)) {
+    private void updateEventState(Event event, EventStateAction stateAction) {
+        if (stateAction.equals(EventStateAction.PUBLISH_EVENT)) {
             event.setState(State.PUBLISHED);
-        } else if (EventStateAction.valueOf(stateAction).equals(EventStateAction.REJECT_EVENT)) {
+        } else if (stateAction.equals(EventStateAction.REJECT_EVENT)) {
             event.setState(State.CANCELED);
         }
     }
