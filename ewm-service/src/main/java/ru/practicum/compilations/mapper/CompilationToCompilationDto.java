@@ -30,8 +30,8 @@ public class CompilationToCompilationDto {
     //вспомогательные методы
 
     private static List<EventShortDto> getEvents(List<Long> ids, List<EventShortDto> eventShortDtoList) {
-        return eventShortDtoList.stream().
-                filter(eventShortDto -> ids.contains(eventShortDto.getId()))
+        return eventShortDtoList.stream()
+                .filter(eventShortDto -> ids.contains(eventShortDto.getId()))
                 .toList();
     }
 }

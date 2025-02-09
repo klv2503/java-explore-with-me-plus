@@ -12,7 +12,6 @@ import ru.practicum.users.model.ParticipationRequest;
 import ru.practicum.users.model.ParticipationRequestStatus;
 import ru.practicum.users.model.User;
 import ru.practicum.users.repository.ParticipationRequestRepository;
-import ru.practicum.users.repository.UserRepository;
 import ru.practicum.users.validation.ParticipationRequestValidator;
 
 import java.time.LocalDateTime;

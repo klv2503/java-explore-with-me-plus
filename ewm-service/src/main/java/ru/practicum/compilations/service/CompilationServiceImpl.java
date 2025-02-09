@@ -45,8 +45,8 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto add(NewCompilationDto newCompilationDto) {
         log.info("Add compilation {}", newCompilationDto);
-        Compilation newCompilation = compilationRepository.
-                save(mapNewCompilationDtoToCompilation(newCompilationDto));
+        Compilation newCompilation = compilationRepository
+                .save(mapNewCompilationDtoToCompilation(newCompilationDto));
         return mapCompilationToCompilationDto(newCompilation, getEventsListForDto(newCompilation));
     }
 
