@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -34,6 +35,11 @@ public class ErrorHandler {
     @ExceptionHandler(ForbiddenActionException.class)
     public ResponseEntity<ApiError> handlerForbiddenActionException(final ForbiddenActionException e) {
         return buildErrorResponse(e, HttpStatus.CONFLICT, "Action not allowed.");
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
+        return buildErrorResponse(e, HttpStatus.BAD_REQUEST, "Argument type mismatch");
     }
 
     @ExceptionHandler

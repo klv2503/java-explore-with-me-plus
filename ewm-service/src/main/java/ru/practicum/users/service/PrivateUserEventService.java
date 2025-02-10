@@ -10,7 +10,10 @@ import java.util.List;
 
 public interface PrivateUserEventService {
     List<EventShortDto> getUsersEvents(GetUserEventsDto dto);
+
     EventFullDto getUserEventById(Long userId, Long eventId);
+
     EventFullDto addNewEvent(Long userId, NewEventDto eventDto);
+
     EventFullDto updateUserEvent(Long userId, Long eventId, UpdateEventUserRequest updateDto);
 }
