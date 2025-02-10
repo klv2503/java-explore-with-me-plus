@@ -17,11 +17,10 @@ INSERT INTO category(name) VALUES
 
 
 
-INSERT INTO events(title, annotation, category_id, description, event_date, is_paid, participant_limit, request_moderation,
-confirmed_requests, state, views, initiator_id) VALUES
-('title', 'annotation', 1, 'description', '2025-10-15 15:00:00', true, 50, true, 10, 'PUBLISHED', 30, 3),
-('title1', 'annotation2', 1, 'description2', '2025-05-10 12:00:00', true, 70, true, 15, 'PUBLISHED', 17, 4),
-('title3', 'annotation3', 1, 'description3', '2025-03-14 10:00:00', false, 100, true, 20, 'PUBLISHED', 22, 7);
+INSERT INTO events(title, annotation, category_id, description, event_date, is_paid, participant_limit, request_moderation, state, views, initiator_id) VALUES
+('title', 'annotation', 1, 'description', '2025-10-15 15:00:00', true, 50, true, 'PUBLISHED', 30, 3),
+('title1', 'annotation2', 1, 'description2', '2025-05-10 12:00:00', true, 70, true, 'PUBLISHED', 17, 4),
+('title3', 'annotation3', 1, 'description3', '2025-03-14 10:00:00', false, 100, true, 'PUBLISHED', 22, 7);
 
 INSERT INTO compilations(pinned, title) VALUES
 (false, 'compilation1'),

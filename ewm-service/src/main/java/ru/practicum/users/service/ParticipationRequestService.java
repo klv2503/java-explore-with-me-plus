@@ -36,13 +36,17 @@ public class ParticipationRequestService {
                 .toList();
     }
 
+    public long getConfirmedRequests(long eventId) {
+        return requestRepository
+                .countConfirmedRequestsByStatusAndEventId(ParticipationRequestStatus.CONFIRMED, eventId);
+    }
+
     @Transactional
     public ParticipationRequestDto addParticipationRequest(Long userId, Long eventId) {
         User user = adminUserService.getUser(userId);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event with id=" + eventId + " was not found"));
-        long confirmedRequestsCount = requestRepository
-                .countConfirmedRequestsByStatusAndEventId(ParticipationRequestStatus.CONFIRMED, eventId);
+        long confirmedRequestsCount = getConfirmedRequests(eventId);
 
         RuntimeException validationError =
                 participationRequestValidator.checkRequest(user, event, confirmedRequestsCount);

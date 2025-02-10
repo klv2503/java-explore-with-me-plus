@@ -15,10 +15,16 @@ import ru.practicum.category.dto.NewCategoryDto;
 import ru.practicum.category.service.CategoryService;
 import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.NewEventDto;
+import ru.practicum.events.dto.UpdateEventAdminRequest;
+import ru.practicum.events.model.EventStateAction;
 import ru.practicum.events.model.Location;
+import ru.practicum.events.service.AdminEventService;
 import ru.practicum.users.dto.ParticipationRequestDto;
 import ru.practicum.users.errors.EventOwnerParticipationException;
+import ru.practicum.users.errors.EventParticipationLimitException;
 import ru.practicum.users.errors.NotPublishedEventParticipationException;
+import ru.practicum.users.errors.RepeatParticipationRequestException;
+import ru.practicum.users.model.ParticipationRequestStatus;
 import ru.practicum.users.model.User;
 import ru.practicum.users.repository.UserRepository;
 import ru.practicum.users.service.ParticipationRequestService;
@@ -47,8 +53,12 @@ public class RequestsForParticipationIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AdminEventService adminEventService;
+
     private User eventOwner;
     private User eventParticipant;
+    private User eventSecondParticipant;
     private EventFullDto pendingEvent;
 
     @BeforeEach
@@ -62,6 +72,11 @@ public class RequestsForParticipationIntegrationTest {
         eventParticipant.setName("Test User");
         eventParticipant.setEmail("eventParticipant@example.com");
         eventParticipant = userRepository.save(eventParticipant);
+
+        eventSecondParticipant = new User();
+        eventSecondParticipant.setName("Test User");
+        eventSecondParticipant.setEmail("eventSecondParticipant@example.com");
+        eventSecondParticipant = userRepository.save(eventSecondParticipant);
 
         NewCategoryDto newCategory = new NewCategoryDto();
         newCategory.setName("Test Category");
@@ -93,14 +108,17 @@ public class RequestsForParticipationIntegrationTest {
     @Test
     @Transactional
     void addParticipationRequest_ShouldCreateNewRequest() {
-//todo published event
-//        ParticipationRequestDto requestDto = participationRequestService
-//                .addParticipationRequest(eventParticipant.getId(), pendingEvent.getId());
-//
-//        assertThat(requestDto).isNotNull();
-//        assertThat(requestDto.getRequester()).isEqualTo(eventOwner.getId());
-//        assertThat(requestDto.getEvent()).isEqualTo(pendingEvent.getId());
-//        assertThat(requestDto.getStatus()).isEqualTo(ParticipationRequestStatus.CONFIRMED);
+        UpdateEventAdminRequest updateEvent = new UpdateEventAdminRequest();
+        updateEvent.setStateAction(EventStateAction.PUBLISH_EVENT);
+        EventFullDto eventFullDto = adminEventService.updateEvent(pendingEvent.getId(), updateEvent);
+
+        ParticipationRequestDto requestDto = participationRequestService
+                .addParticipationRequest(eventParticipant.getId(), eventFullDto.getId());
+
+        assertThat(requestDto).isNotNull();
+        assertThat(requestDto.getRequester()).isEqualTo(eventParticipant.getId());
+        assertThat(requestDto.getEvent()).isEqualTo(pendingEvent.getId());
+        assertThat(requestDto.getStatus()).isEqualTo(ParticipationRequestStatus.CONFIRMED);
     }
 
     @Test
@@ -110,30 +128,36 @@ public class RequestsForParticipationIntegrationTest {
             participationRequestService.addParticipationRequest(eventOwner.getId(), pendingEvent.getId());
         });
 
-//todo published event
-//        assertThrows(EventParticipationLimitException.class, () -> {
-//            participationRequestService.addParticipationRequest(eventOwner.getId(), pendingEvent.getId());
-//        });
-
         assertThrows(NotPublishedEventParticipationException.class, () -> {
             participationRequestService.addParticipationRequest(eventParticipant.getId(), pendingEvent.getId());
         });
-//todo published event
-//        assertThrows(RepeatParticipationRequestException.class, () -> {
-//            participationRequestService.addParticipationRequest(eventParticipant.getId(), pendingEvent.getId());
-//            participationRequestService.addParticipationRequest(eventParticipant.getId(), pendingEvent.getId());
-//        });
+
+        UpdateEventAdminRequest updateEvent = new UpdateEventAdminRequest();
+        updateEvent.setStateAction(EventStateAction.PUBLISH_EVENT);
+        EventFullDto eventFullDto = adminEventService.updateEvent(pendingEvent.getId(), updateEvent);
+
+        assertThrows(EventParticipationLimitException.class, () -> {
+            participationRequestService.addParticipationRequest(eventParticipant.getId(), eventFullDto.getId());
+            participationRequestService.addParticipationRequest(eventSecondParticipant.getId(), eventFullDto.getId());
+        });
+
+        assertThrows(RepeatParticipationRequestException.class, () -> {
+            participationRequestService.addParticipationRequest(eventParticipant.getId(), eventFullDto.getId());
+        });
     }
 
     @Test
     @Transactional
     void cancelRequest_ShouldChangeRequestStatusToCanceled() {
-//todo published event
-//        ParticipationRequestDto requestDto = participationRequestService
-//                .addParticipationRequest(eventOwner.getId(), pendingEvent.getId());
-//        ParticipationRequestDto canceledRequest = participationRequestService
-//                .cancelRequest(eventOwner.getId(), requestDto.getId());
-//
-//        assertThat(canceledRequest.getStatus()).isEqualTo(ParticipationRequestStatus.CANCELED);
+        UpdateEventAdminRequest updateEvent = new UpdateEventAdminRequest();
+        updateEvent.setStateAction(EventStateAction.PUBLISH_EVENT);
+        EventFullDto eventFullDto = adminEventService.updateEvent(pendingEvent.getId(), updateEvent);
+
+        ParticipationRequestDto requestDto = participationRequestService
+                .addParticipationRequest(eventParticipant.getId(), eventFullDto.getId());
+        ParticipationRequestDto canceledRequest = participationRequestService
+                .cancelRequest(eventParticipant.getId(), requestDto.getId());
+
+        assertThat(canceledRequest.getStatus()).isEqualTo(ParticipationRequestStatus.CANCELED);
     }
 }
