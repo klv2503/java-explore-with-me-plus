@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.events.dto.EventFullDto;
@@ -48,17 +49,17 @@ public class AdminEventServiceImpl implements AdminEventService {
         BooleanBuilder builder = new BooleanBuilder();
 
         // Фильтрация по пользователям
-        if (users != null && !users.isEmpty()) {
+        if (!CollectionUtils.isEmpty(users)) {
             builder.and(event.initiator.id.in(users));
         }
 
         // Фильтрация по состояниям
-        if (states != null && !states.isEmpty()) {
+        if (!CollectionUtils.isEmpty(states)) {
             builder.and(event.state.in(states.stream().map(State::valueOf).collect(Collectors.toList())));
         }
 
         // Фильтрация по категориям
-        if (categories != null && !categories.isEmpty()) {
+        if (!CollectionUtils.isEmpty(categories)) {
             builder.and(event.category.id.in(categories));
         }
 
