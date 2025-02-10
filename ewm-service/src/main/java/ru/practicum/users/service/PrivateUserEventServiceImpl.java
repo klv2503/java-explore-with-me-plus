@@ -45,7 +45,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
         User user = adminUserService.getUser(userId);
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
-        return EventMapper.toEventFullDto(event, user);
+        return EventMapper.toEventFullDto(event);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
 
         eventRepository.save(event);
 
-        return EventMapper.toEventFullDto(event, user);
+        return EventMapper.toEventFullDto(event);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
 
         updateEventState(event, updateDto.getStateAction());
 
-        return EventMapper.toEventFullDto(eventRepository.save(event), user);
+        return EventMapper.toEventFullDto(eventRepository.save(event));
     }
 
     private LocalDateTime parseEventDate(String date) {

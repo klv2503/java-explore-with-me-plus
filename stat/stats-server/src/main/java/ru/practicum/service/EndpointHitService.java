@@ -28,7 +28,7 @@ public class EndpointHitService {
     }
 
     @Transactional
-    public void saveHit(CreateEndpointHitDto endpointHitDto) {
+    public Integer saveHit(CreateEndpointHitDto endpointHitDto) {
         EndpointHit endpointHit = new EndpointHit();
         endpointHit.setApp(endpointHitDto.getApp());
         endpointHit.setUri(endpointHitDto.getUri());
@@ -38,6 +38,7 @@ public class EndpointHitService {
                 : LocalDateTime.now());
 
         endpointHitRepository.save(endpointHit);
+        return endpointHitRepository.getViews(endpointHit.getUri());
     }
 
     public Collection<ReadEndpointHitDto> getHits(LocalDateTime start, LocalDateTime end,

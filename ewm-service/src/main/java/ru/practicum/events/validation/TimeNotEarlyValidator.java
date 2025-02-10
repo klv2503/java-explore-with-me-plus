@@ -2,6 +2,7 @@ package ru.practicum.events.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.mapstruct.ap.internal.util.Strings;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +19,7 @@ public class TimeNotEarlyValidator implements ConstraintValidator<TimeNotEarly, 
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) {
+        if (Strings.isEmpty(value)) {
             return false;
         }
         try {

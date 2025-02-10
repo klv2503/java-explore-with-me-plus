@@ -59,14 +59,14 @@ public class EventMapper {
     }
 
 
-    public static EventFullDto toEventFullDto(Event event, User user) {
+    public static EventFullDto toEventFullDto(Event event) {
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
                 .confirmedRequests(0)
                 .eventDate(event.getEventDate().toString())
-                .initiator(new UserShortDto(user.getId(), user.getName()))
+                .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
                 .paid(event.isPaid())
                 .title(event.getTitle())
                 .views(event.getViews())

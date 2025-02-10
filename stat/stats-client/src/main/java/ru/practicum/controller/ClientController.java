@@ -17,7 +17,7 @@ public class ClientController {
     private final RestClient restClient;
 
     @PostMapping("/hit")
-    public void hit(@RequestParam String addr, @RequestParam String uri) {
+    public Integer hit(@RequestParam String addr, @RequestParam String uri) {
         CreateEndpointHitDto dto = new CreateEndpointHitDto(
                 "ewm-main-service",
                 uri,
@@ -25,11 +25,13 @@ public class ClientController {
                 LocalDateTime.now()
         );
 
-        restClient.post()
+        Integer result = restClient.post()
                 .uri(URI.create("http://stats-server:9090/hit"))
                 .body(dto)
                 .retrieve()
-                .toBodilessEntity();
+                .toEntity(Integer.class).getBody();
+
+        return (result == null) ? 0 : result;
     }
 }
 
