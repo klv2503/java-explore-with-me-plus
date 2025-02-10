@@ -15,11 +15,11 @@ import java.util.Set;
 public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @ElementCollection
     @CollectionTable(name = "compilation_events", joinColumns = @JoinColumn(name = "compilation_id"))
     @Column(name = "event_id")
-    Set<Long> events;
-    Boolean pinned;
-    String title;
+    private Set<Long> events;
+    private Boolean pinned;
+    private String title;
 }

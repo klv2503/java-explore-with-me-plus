@@ -32,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto addCategory(NewCategoryDto inputCat) {
         log.info("\nAdminUserService.addUser {}", inputCat);
         Category category = newCategoryMapper.mapNewCategoryDtoToCategory(inputCat);
-        return categoryDtoMapper.mapCategoryToDto(categoryRepository.save(category));
+        return CategoryDtoMapper.mapCategoryToDto(categoryRepository.save(category));
     }
 
     @Override
@@ -46,13 +46,13 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto updateCategory(CategoryDto inputCat) {
         if (!categoryRepository.existsById(inputCat.getId()))
             throw new EntityNotFoundException("Category with " + inputCat.getId() + " not found");
-        categoryRepository.save(categoryDtoMapper.mapDtoToCategory(inputCat));
+        categoryRepository.save(CategoryDtoMapper.mapDtoToCategory(inputCat));
         return inputCat;
     }
 
     @Override
     public CategoryDto getCategory(long id) {
-        return categoryDtoMapper.mapCategoryToDto(getCategoryById(id));
+        return CategoryDtoMapper.mapCategoryToDto(getCategoryById(id));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
         Pageable pageable = PageRequest.of(page, params.getSize());
         Page<Category> response = categoryRepository.findAll(pageable);
         List<Category> categories = response.getContent().stream().toList();
-        return categoryDtoMapper.mapCatListToDtoList(categories);
+        return CategoryDtoMapper.mapCatListToDtoList(categories);
     }
 
     private Category getCategoryById(Long id) {

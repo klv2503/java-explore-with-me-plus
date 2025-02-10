@@ -13,10 +13,10 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewCompilationDto {
-    Set<Long> events;
-    Boolean pinned;
+    private Set<Long> events;
+    private Boolean pinned;
     @NotNull(message = "Field: title. Error: must not be null. Value: null")
     @NotBlank(message = "Field: title. Error: must not be blank. Value: empty")
-    @Size(min = 1, max = 50, message = "Field: title. Error: length must be between 1 and 50 symbols.")
-    String title;
+    @Size(max = 50, message = "Field: title. Error: length must be between 1 and 50 symbols.")
+    private String title;
 }

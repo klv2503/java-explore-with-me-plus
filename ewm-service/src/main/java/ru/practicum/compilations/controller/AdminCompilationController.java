@@ -37,10 +37,10 @@ public class AdminCompilationController {
     }
 
     @DeleteMapping("/{compId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable @Min(value = 1, message = "ID must be positive")
-                       Long compId) {
+    public ResponseEntity<Void> delete(@PathVariable @Min(value = 1, message = "ID must be positive")
+                                       Long compId) {
         log.info("Request for delete compilation with id {}", compId);
         compilationService.delete(compId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

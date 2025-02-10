@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.CONFLICT)
 public class ForbiddenActionException extends RuntimeException {
-  public ForbiddenActionException(String message) {
-    super(message);
-  }
+    public ForbiddenActionException(String message) {
+        super(message);
+    }
 }

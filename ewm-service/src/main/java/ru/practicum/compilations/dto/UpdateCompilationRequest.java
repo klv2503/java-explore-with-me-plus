@@ -12,9 +12,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateCompilationRequest {
-    Set<Long> events;
-    Boolean pinned;
+    private Set<Long> events;
+    private Boolean pinned;
     @NotBlank(message = "Field: title. Error: must not be blank. Value: empty")
     @Size(min = 1, max = 50, message = "Field: title. Error: length must be between 1 and 50 symbols.")
-    String title;
+    private String title;
 }

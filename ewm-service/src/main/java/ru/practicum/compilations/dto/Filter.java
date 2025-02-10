@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class Filter {
-    Boolean pinned;
-    Integer from;
-    Integer size;
+    private Boolean pinned;
+    private Integer from;
+    private Integer size;
 }

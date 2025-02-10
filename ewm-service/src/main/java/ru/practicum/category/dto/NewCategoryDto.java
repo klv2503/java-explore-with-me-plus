@@ -15,5 +15,5 @@ public class NewCategoryDto {
     @NotNull(message = "Field: name. Error: must not be blank. Value: null")
     @NotBlank(message = "Field: name. Error: must not be blank. Value: empty")
     @Size(max = 50, message = "Field: name. Error: length must be not longer as 50 symbols")
-    String name;
+    private String name;
 }
