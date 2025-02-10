@@ -48,38 +48,11 @@ public class EventMapper {
                 .paid(dto.isPaid())
                 .participantLimit(dto.getParticipantLimit())
                 .requestModeration(dto.isRequestModeration())
-                .confirmedRequests(0)
                 .initiator(user)
                 .createdOn(LocalDateTime.now())
                 .publishedOn(LocalDateTime.now())
                 .state(State.PENDING)
                 .views(0)
-                .build();
-    }
-
-
-    public static EventFullDto toEventFullDto(Event event, User user) {
-        String publishedOn = event.getPublishedOn() == null?
-                null :
-                event.getPublishedOn().format(DateConfig.FORMATTER);
-
-        return EventFullDto.builder()
-                .id(event.getId())
-                .annotation(event.getAnnotation())
-                .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
-                .confirmedRequests(0)
-                .eventDate(event.getEventDate().toString())
-                .initiator(new UserShortDto(user.getId(), user.getName()))
-                .paid(event.isPaid())
-                .title(event.getTitle())
-                .views(event.getViews())
-                .createdOn(event.getCreatedOn().toString())
-                .description(event.getDescription())
-                .location(event.getLocation())
-                .participantLimit(event.getParticipantLimit())
-                .publishedOn(publishedOn)
-                .requestModeration(event.isRequestModeration())
-                .state(event.getState())
                 .build();
     }
 
@@ -92,7 +65,7 @@ public class EventMapper {
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
-                .confirmedRequests(0)
+                .confirmedRequests(0) //todo get by ParticipationRequestRepository
                 .eventDate(event.getEventDate().format(DateConfig.FORMATTER))
                 .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
                 .paid(event.isPaid())
@@ -113,7 +86,7 @@ public class EventMapper {
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
-                .confirmedRequests(event.getConfirmedRequests())
+                .confirmedRequests(0) //todo get by ParticipationRequestRepository
                 .eventDate(event.getEventDate().toString())
                 .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
                 .paid(event.isPaid())

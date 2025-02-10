@@ -47,9 +47,6 @@ public class Event {
     @Column(name = "request_moderation")
     private boolean requestModeration;
 
-    @Column(name = "confirmed_requests")
-    private int confirmedRequests;
-
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;

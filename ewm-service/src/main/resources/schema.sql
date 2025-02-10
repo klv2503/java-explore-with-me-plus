@@ -33,7 +33,6 @@ CREATE TABLE IF NOT EXISTS events (
   is_paid boolean,
   participant_limit BIGINT,
   request_moderation boolean,
-  confirmed_requests BIGINT,
   creation_date TIMESTAMP WITHOUT TIME ZONE,
   publication_date TIMESTAMP WITHOUT TIME ZONE,
   state VARCHAR(50) NOT NULL,
