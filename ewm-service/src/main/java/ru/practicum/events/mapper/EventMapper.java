@@ -57,7 +57,7 @@ public class EventMapper {
     }
 
     public static EventFullDto toEventFullDto(Event event) {
-        String publishedOn = event.getPublishedOn() == null?
+        String publishedOn = event.getPublishedOn() == null ?
                 null :
                 event.getPublishedOn().format(DateConfig.FORMATTER);
 

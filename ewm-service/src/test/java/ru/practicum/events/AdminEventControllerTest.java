@@ -61,7 +61,7 @@ public class AdminEventControllerTest {
     private final UpdateEventAdminRequest updateEventRequest = UpdateEventAdminRequest.builder()
             .title("Updated Title")
             .description("Updated Description")
-            .eventDate( LocalDateTime.now().plusDays(2))
+            .eventDate(LocalDateTime.now().plusDays(2))
             .paid(false)
             .participantLimit(50)
             .build();
