@@ -60,6 +60,10 @@ public class EventMapper {
 
 
     public static EventFullDto toEventFullDto(Event event, User user) {
+        String publishedOn = event.getPublishedOn() == null?
+                null :
+                event.getPublishedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -74,13 +78,17 @@ public class EventMapper {
                 .description(event.getDescription())
                 .location(event.getLocation())
                 .participantLimit(event.getParticipantLimit())
-                .publishedOn(event.getPublishedOn().toString())
+                .publishedOn(publishedOn)
                 .requestModeration(event.isRequestModeration())
                 .state(event.getState())
                 .build();
     }
 
     public static EventFullDto toEventFullDto(Event event) {
+        String publishedOn = event.getPublishedOn() == null?
+                null :
+                event.getPublishedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -95,7 +103,7 @@ public class EventMapper {
                 .description(event.getDescription())
                 .location(event.getLocation())
                 .participantLimit(event.getParticipantLimit())
-                .publishedOn(event.getPublishedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .publishedOn(publishedOn)
                 .requestModeration(event.isRequestModeration())
                 .state(event.getState())
                 .build();

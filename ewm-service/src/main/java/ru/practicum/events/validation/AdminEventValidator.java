@@ -16,6 +16,9 @@ public class AdminEventValidator {
             throw new ForbiddenActionException("Event start time must be at least 1 hour after publication.");
         }
 
+        if (updateRequest.getStateAction() == null)
+            return;
+
         boolean isPublishAction = updateRequest.getStateAction()
                 .equals(EventStateAction.PUBLISH_EVENT);
         boolean isRejectAction = updateRequest.getStateAction()

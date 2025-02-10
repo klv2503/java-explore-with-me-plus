@@ -134,6 +134,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     private void updateEventState(Event event, EventStateAction stateAction) {
         if (stateAction.equals(EventStateAction.PUBLISH_EVENT)) {
             event.setState(State.PUBLISHED);
+            event.setPublishedOn(LocalDateTime.now());
         } else if (stateAction.equals(EventStateAction.REJECT_EVENT)) {
             event.setState(State.CANCELED);
         }
