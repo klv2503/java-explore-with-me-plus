@@ -16,4 +16,6 @@ public class LookEventDto {
     private String uri;
 
     private String ip;
+
+    private boolean isNeedToSave;
 }

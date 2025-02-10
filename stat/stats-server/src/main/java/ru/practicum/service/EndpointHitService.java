@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.CreateEndpointHitDto;
 import ru.practicum.dto.ReadEndpointHitDto;
+import ru.practicum.dto.TakeHitsDto;
 import ru.practicum.model.EndpointHit;
 import ru.practicum.repository.EndpointHitRepository;
 
@@ -28,7 +29,7 @@ public class EndpointHitService {
     }
 
     @Transactional
-    public Integer saveHit(CreateEndpointHitDto endpointHitDto) {
+    public void saveHit(CreateEndpointHitDto endpointHitDto) {
         EndpointHit endpointHit = new EndpointHit();
         endpointHit.setApp(endpointHitDto.getApp());
         endpointHit.setUri(endpointHitDto.getUri());
@@ -38,14 +39,17 @@ public class EndpointHitService {
                 : LocalDateTime.now());
 
         endpointHitRepository.save(endpointHit);
-        return endpointHitRepository.getViews(endpointHit.getUri());
     }
 
-    public Collection<ReadEndpointHitDto> getHits(LocalDateTime start, LocalDateTime end,
-                                                  Optional<List<String>> uris, boolean unique) {
-        Collection<ReadEndpointHitDto> hits = endpointHitRepository.get(start, end, uris, unique).stream()
+    public Collection<ReadEndpointHitDto> getHits(TakeHitsDto takeHitsDto) {
+        Collection<ReadEndpointHitDto> hits = endpointHitRepository.get(takeHitsDto).stream()
                 .sorted(Comparator.comparingInt(ReadEndpointHitDto::getHits)).toList().reversed();
 
         return hits;
+    }
+
+    public Integer getViewCount(String uri) {
+        Integer result = endpointHitRepository.getViews(uri);
+        return (result == null) ? 0 : result;
     }
 }

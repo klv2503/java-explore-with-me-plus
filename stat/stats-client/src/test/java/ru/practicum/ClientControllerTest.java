@@ -19,7 +19,7 @@ public class ClientControllerTest {
 
     @Test
     void testHitEndpoint() {
-        clientController.hit("192.168.0.1", "/api/test");
+        clientController.saveView("192.168.0.1", "/api/test");
 
         verify(restClient).post();
     }

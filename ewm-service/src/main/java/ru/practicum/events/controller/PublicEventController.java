@@ -14,6 +14,8 @@ import ru.practicum.events.dto.LookEventDto;
 import ru.practicum.events.dto.SearchEventsParams;
 import ru.practicum.events.service.PublicEventsService;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -23,7 +25,7 @@ import java.util.List;
 @Slf4j
 public class PublicEventController {
 
-    PublicEventsService publicEventsService;
+    private final PublicEventsService publicEventsService;
 
     @GetMapping
     public ResponseEntity<List<EventShortDto>>
@@ -46,10 +48,12 @@ public class PublicEventController {
     public ResponseEntity<EventFullDto> getEventInfo(@PathVariable
                                                      @Min(value = 1, message = "ID must be positive") Long id,
                                                      HttpServletRequest request) {
+        String encodedUri = URLEncoder.encode(request.getRequestURI(), StandardCharsets.UTF_8);
         LookEventDto lookEventDto = LookEventDto.builder()
                 .id(id)
-                .uri(request.getRequestURI())
+                .uri(encodedUri)
                 .ip(request.getRemoteAddr())
+                .isNeedToSave(true)
                 .build();
         log.info("\nPublicEventController.getEventInfo accepted {}", lookEventDto);
 

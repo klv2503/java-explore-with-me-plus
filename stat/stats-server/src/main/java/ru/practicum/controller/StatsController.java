@@ -1,12 +1,14 @@
 package ru.practicum.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.CreateEndpointHitDto;
+import ru.practicum.dto.TakeHitsDto;
 import ru.practicum.dto.ReadEndpointHitDto;
 import ru.practicum.service.EndpointHitService;
 
@@ -16,7 +18,8 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("")
+@Slf4j
 public class StatsController {
 
     private final EndpointHitService endpointHitService;
@@ -27,9 +30,9 @@ public class StatsController {
     }
 
     @PostMapping("/hit")
-    public ResponseEntity<Integer> saveHit(@Valid @RequestBody CreateEndpointHitDto dto) {
-        Integer result = endpointHitService.saveHit(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    public ResponseEntity<Void> saveHit(@Valid @RequestBody CreateEndpointHitDto dto) {
+        endpointHitService.saveHit(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/stats")
@@ -43,6 +46,21 @@ public class StatsController {
                                                                   Optional<List<String>> uris,
                                                                   @RequestParam(required = false, defaultValue = "false")
                                                                   boolean unique) {
-        return ResponseEntity.status(HttpStatus.OK).body(endpointHitService.getHits(start, end, uris, unique));
+        TakeHitsDto takeHitsDto = TakeHitsDto.builder()
+                .start(start)
+                .end(end)
+                .uris(uris.orElse(List.of()))
+                .unique(unique)
+                .build();
+        log.info("\nStatsController.getHits accepted {}", takeHitsDto);
+        return ResponseEntity.status(HttpStatus.OK).body(endpointHitService.getHits(takeHitsDto));
+    }
+
+    //Решил добавить новый ендпойнт для получения числа просмотров
+    @GetMapping("/stats/{uri}")
+    public ResponseEntity<Integer> getViewCount(@PathVariable String uri) {
+        log.info("\nStatsController.getViewCount accepted {}", uri);
+        Integer result = endpointHitService.getViewCount(uri);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 }
