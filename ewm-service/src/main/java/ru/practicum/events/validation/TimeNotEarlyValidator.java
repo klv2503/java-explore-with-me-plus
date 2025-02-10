@@ -2,14 +2,13 @@ package ru.practicum.events.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import ru.practicum.config.DateConfig;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class TimeNotEarlyValidator implements ConstraintValidator<TimeNotEarly, String> {
     private int hours;
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public void initialize(TimeNotEarly constraintAnnotation) {
@@ -22,7 +21,7 @@ public class TimeNotEarlyValidator implements ConstraintValidator<TimeNotEarly, 
             return false;
         }
         try {
-            LocalDateTime appointedDate = LocalDateTime.parse(value, FORMATTER);
+            LocalDateTime appointedDate = LocalDateTime.parse(value, DateConfig.FORMATTER);
             LocalDateTime minDate = LocalDateTime.now().plusHours(hours);
             return !appointedDate.isBefore(minDate);
         } catch (DateTimeParseException e) {

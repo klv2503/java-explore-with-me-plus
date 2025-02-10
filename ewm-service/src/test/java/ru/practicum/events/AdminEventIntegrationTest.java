@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.MainService;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
+import ru.practicum.config.DateConfig;
 import ru.practicum.errors.ForbiddenActionException;
 import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.UpdateEventAdminRequest;
@@ -25,7 +26,6 @@ import ru.practicum.users.model.User;
 import ru.practicum.users.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,8 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(SpringExtension.class)
 @Transactional
 public class AdminEventIntegrationTest {
-
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     private AdminEventService adminEventService;
@@ -128,7 +126,7 @@ public class AdminEventIntegrationTest {
         assertThat(updatedEvent.getTitle()).isEqualTo("Updated Event Title");
         assertThat(updatedEvent.getDescription()).isEqualTo("Updated Description");
         assertThat(updatedEvent.getAnnotation()).isEqualTo("Updated Annotation");
-        assertThat(updatedEvent.getEventDate()).isEqualTo(eventDate.format(formatter));
+        assertThat(updatedEvent.getEventDate()).isEqualTo(eventDate.format(DateConfig.FORMATTER));
         assertThat(updatedEvent.getCategory().getId()).isEqualTo(testCategory2.getId());
         assertThat(updatedEvent.isPaid()).isEqualTo(false);
         assertThat(updatedEvent.getParticipantLimit()).isEqualTo(5);
