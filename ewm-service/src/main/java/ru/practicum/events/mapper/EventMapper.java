@@ -49,7 +49,7 @@ public class EventMapper {
                 .paid(dto.isPaid())
                 .participantLimit(dto.getParticipantLimit())
                 .requestModeration(dto.isRequestModeration())
-                .confirmedRequests(0L)
+                .confirmedRequests(0)
                 .initiator(user)
                 .createdOn(LocalDateTime.now())
                 .publishedOn(LocalDateTime.now())

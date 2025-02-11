@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -47,6 +48,31 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
     }
 
     @Override
+    public Event findEventWithStatus(Long eventId, ParticipationRequestStatus status) {
+        QEvent event = QEvent.event;
+        QParticipationRequest request = QParticipationRequest.participationRequest;
+
+        JPAQuery<Tuple> query = new JPAQuery<>(em)
+                .select(event, request.id.count())
+                .from(event)
+                .leftJoin(request).on(request.event.eq(event).and(request.status.eq(status)))
+                .where(event.id.eq(eventId))
+                .groupBy(event);
+        Tuple result = query.fetchOne();
+
+        if (result == null) {
+            throw new EntityNotFoundException("Event with" + eventId + " not found");
+        }
+
+        Event foundEvent = result.get(event);
+        Integer confirmedCount = result.get(request.id.count()).intValue();
+
+        foundEvent.setConfirmedRequests((confirmedCount == null) ? 0 : confirmedCount);
+
+        return foundEvent;
+    }
+
+    @Override
     public List<Event> searchEvents(BooleanBuilder eventCondition, ParticipationRequestStatus status,
                                     boolean onlyAvailable, int from, int size) {
         QEvent event = QEvent.event;
@@ -69,7 +95,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         for (Tuple tuple : results) {
             Event e = tuple.get(event);  // Извлекаем событие
             if (e != null) {
-                Long confirmedCount = tuple.get(1, Long.class);  // Извлекаем количество участников
+                Integer confirmedCount = tuple.get(1, Integer.class);  // Извлекаем количество участников
                 e.setConfirmedRequests((confirmedCount == null) ? 0 : confirmedCount);  // пишем в транзиентное поле
                 if (!onlyAvailable ||
                         e.getParticipantLimit() == 0 ||

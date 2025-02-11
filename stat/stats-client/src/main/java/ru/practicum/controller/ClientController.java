@@ -46,17 +46,6 @@ public class ClientController {
     }
 
     @GetMapping
-    public Integer countView(@RequestParam String uri) {
-        log.info("\nClientController.countView uri {}", uri);
-        Integer result = restClient.get()
-                .uri("http://stats-server:9090/stats/{uri}", uri)
-                .retrieve()
-                .toEntity(Integer.class).getBody();
-
-        return (result == null) ? 0 : result;
-    }
-
-    @GetMapping("/list")
     public List<ReadEndpointHitDto> getHits(@RequestParam String start,
                                             @RequestParam String end,
                                             @RequestParam List<String> uris,

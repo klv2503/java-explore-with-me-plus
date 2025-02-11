@@ -1,7 +1,6 @@
 package ru.practicum.events.service;
 
 import com.querydsl.core.BooleanBuilder;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.ap.internal.util.Strings;
@@ -21,7 +20,6 @@ import ru.practicum.events.model.QEvent;
 import ru.practicum.events.model.State;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.users.model.ParticipationRequestStatus;
-import ru.practicum.users.service.AdminUserService;
 import ru.practicum.users.service.ParticipationRequestService;
 
 import java.time.LocalDateTime;
@@ -34,16 +32,25 @@ public class PublicEventsServiceImpl implements PublicEventsService {
 
     private final EventRepository eventRepository;
 
-    private final AdminUserService adminUserService;
-
     private final ClientController clientController;
 
     private final ParticipationRequestService participationRequestService;
 
     @Override
     public Event getEvent(Long id) {
-        return eventRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Event with " + id + " not found"));
+        Event event = eventRepository.findEventWithStatus(id, ParticipationRequestStatus.CONFIRMED);
+        event.setViews(getEventsViews(id, event.getEventDate()));
+        return event;
+    }
+
+    @Override
+    public int getEventsViews(long id, LocalDateTime eventDate) {
+        List<String> uris = List.of("/events/" + id);
+        List<ReadEndpointHitDto> res = clientController.getHits(eventDate.format(DateConfig.FORMATTER),
+                eventDate.format(DateConfig.FORMATTER), uris, false);
+        if (CollectionUtils.isEmpty(res))
+            throw new RuntimeException("Internal server error");
+        return res.getFirst().getHits();
     }
 
     @Override
@@ -53,13 +60,9 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         if (!event.getState().equals(State.PUBLISHED)) {
             throw new EventNotPublishedException("Event is not available.");
         }
-        event.setConfirmedRequests(participationRequestService.getConfirmedRequests(lookEventDto.getId()));
         //Имеем новый просмотр - сохраняем его
         clientController.saveView(lookEventDto.getIp(), lookEventDto.getUri());
 
-        //Считаем количество просмотров
-        Integer views = clientController.countView(lookEventDto.getUri());
-        event.setViews((views == null) ? 0 : views);
         return EventMapper.toEventFullDto(event);
     }
 

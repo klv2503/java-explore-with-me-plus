@@ -56,12 +56,4 @@ public class StatsController {
         log.info("\nStatsController.getHits accepted {}", takeHitsDto);
         return ResponseEntity.status(HttpStatus.OK).body(endpointHitService.getHits(takeHitsDto));
     }
-
-    //Решил добавить новый ендпойнт для получения числа просмотров
-    @GetMapping("/stats/{uri}")
-    public ResponseEntity<Integer> getViewCount(@PathVariable String uri) {
-        log.info("\nStatsController.getViewCount accepted {}", uri);
-        Integer result = endpointHitService.getViewCount(uri);
-        return ResponseEntity.status(HttpStatus.OK).body(result);
-    }
 }

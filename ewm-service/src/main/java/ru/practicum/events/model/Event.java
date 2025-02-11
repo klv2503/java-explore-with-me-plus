@@ -30,7 +30,7 @@ public class Event {
     private Category category;
 
     @Transient
-    private Long confirmedRequests;
+    private int confirmedRequests;
 
     private String description;
 
@@ -63,6 +63,5 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private State state;
 
-    @Transient
     private Integer views;
 }
