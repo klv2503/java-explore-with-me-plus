@@ -36,6 +36,11 @@ public class ErrorHandler {
         return buildErrorResponse(e, HttpStatus.CONFLICT, "Action not allowed.");
     }
 
+    @ExceptionHandler(EventNotPublishedException.class)
+    public ResponseEntity<ApiError> handlerForbiddenActionException(final EventNotPublishedException e) {
+        return buildErrorResponse(e, HttpStatus.NOT_FOUND, "Event is not available.");
+    }
+
     @ExceptionHandler
     public ResponseEntity<ApiError> handlerOtherException(final Exception e) {
         return buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, "Got 500 status Internal server error");

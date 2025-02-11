@@ -63,5 +63,6 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private State state;
 
-    private int views;
+    @Transient
+    private Integer views;
 }

@@ -11,11 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LookEventDto {
 
-    private long id;
+    private Long id;
 
     private String uri;
 
     private String ip;
 
-    private boolean isNeedToSave;
 }

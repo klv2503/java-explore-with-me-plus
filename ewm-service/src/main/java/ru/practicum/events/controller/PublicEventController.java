@@ -37,7 +37,14 @@ public class PublicEventController {
                       @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
                       @RequestParam(required = false, defaultValue = "EVENT_DATE") String sort,
                       @RequestParam(required = false, defaultValue = "0") int from,
-                      @RequestParam(required = false, defaultValue = "10") int size) {
+                      @RequestParam(required = false, defaultValue = "10") int size,
+                      HttpServletRequest request) {
+        String encodedUri = URLEncoder.encode(request.getRequestURI(), StandardCharsets.UTF_8);
+        LookEventDto lookEventDto = LookEventDto.builder()
+                .id(null)
+                .uri(encodedUri)
+                .ip(request.getRemoteAddr())
+                .build();
         SearchEventsParams searchEventsParams =
                 new SearchEventsParams(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         log.info("\nPublicEventController.getFilteredEvents {}", searchEventsParams);
@@ -53,7 +60,6 @@ public class PublicEventController {
                 .id(id)
                 .uri(encodedUri)
                 .ip(request.getRemoteAddr())
-                .isNeedToSave(true)
                 .build();
         log.info("\nPublicEventController.getEventInfo accepted {}", lookEventDto);
 
