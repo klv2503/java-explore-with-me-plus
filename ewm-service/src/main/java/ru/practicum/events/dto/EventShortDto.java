@@ -19,7 +19,7 @@ public class EventShortDto {
     private Long id;
     private String annotation;
     private CategoryDto category;
-    private int confirmedRequests;
+    private long confirmedRequests;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateConfig.FORMAT)
     private String eventDate;
     private UserShortDto initiator;

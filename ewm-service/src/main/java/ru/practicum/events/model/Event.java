@@ -29,6 +29,9 @@ public class Event {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Transient
+    private Long confirmedRequests;
+
     private String description;
 
     @Column(name = "event_date")

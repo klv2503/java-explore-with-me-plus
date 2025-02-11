@@ -14,6 +14,7 @@ import ru.practicum.users.dto.UserShortDto;
 import ru.practicum.users.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
@@ -48,7 +49,7 @@ public class EventMapper {
                 .paid(dto.isPaid())
                 .participantLimit(dto.getParticipantLimit())
                 .requestModeration(dto.isRequestModeration())
-                .confirmedRequests(0)
+                .confirmedRequests(0L)
                 .initiator(user)
                 .createdOn(LocalDateTime.now())
                 .publishedOn(LocalDateTime.now())
@@ -66,7 +67,7 @@ public class EventMapper {
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
-                .confirmedRequests(0) //todo get by ParticipationRequestRepository
+                .confirmedRequests(event.getConfirmedRequests()) //todo get by ParticipationRequestRepository
                 .eventDate(event.getEventDate().format(DateConfig.FORMATTER))
                 .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
                 .paid(event.isPaid())
@@ -87,7 +88,7 @@ public class EventMapper {
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
-                .confirmedRequests(0) //todo get by ParticipationRequestRepository
+                .confirmedRequests(event.getConfirmedRequests())
                 .eventDate(event.getEventDate().toString())
                 .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
                 .paid(event.isPaid())
@@ -95,4 +96,11 @@ public class EventMapper {
                 .views(event.getViews())
                 .build();
     }
+
+    public static List<EventShortDto> toListEventShortDto(List<Event> events) {
+        return events.stream()
+                .map(EventMapper::toEventShortDto)
+                .toList();
+    }
+
 }
