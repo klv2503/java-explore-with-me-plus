@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.category.repository.CategoryRepository;
+import ru.practicum.config.DateConfig;
 import ru.practicum.errors.ForbiddenActionException;
 import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.EventShortDto;
@@ -19,7 +20,6 @@ import ru.practicum.users.dto.GetUserEventsDto;
 import ru.practicum.users.model.User;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,6 +78,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
         event.setPaid(updateDto.isPaid());
         event.setParticipantLimit(updateDto.getParticipantLimit());
         event.setRequestModeration(updateDto.isRequestModeration());
+        event.setInitiator(user);
 
         updateEventState(event, updateDto.getStateAction());
 
@@ -85,7 +86,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
     }
 
     private LocalDateTime parseEventDate(String date) {
-        return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return LocalDateTime.parse(date, DateConfig.FORMATTER);
     }
 
     private void updateEventState(Event event, String stateAction) {

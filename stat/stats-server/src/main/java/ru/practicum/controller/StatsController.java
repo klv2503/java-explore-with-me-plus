@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.config.DateConfig;
 import ru.practicum.dto.CreateEndpointHitDto;
 import ru.practicum.dto.TakeHitsDto;
 import ru.practicum.dto.ReadEndpointHitDto;
@@ -37,10 +38,10 @@ public class StatsController {
 
     @GetMapping("/stats")
     public ResponseEntity<Collection<ReadEndpointHitDto>> getHits(@RequestParam
-                                                                  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                                  @DateTimeFormat(pattern = DateConfig.FORMAT)
                                                                   LocalDateTime start,
                                                                   @RequestParam
-                                                                  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                                  @DateTimeFormat(pattern = DateConfig.FORMAT)
                                                                   LocalDateTime end,
                                                                   @RequestParam(required = false)
                                                                   Optional<List<String>> uris,

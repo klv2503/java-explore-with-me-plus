@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GetCategoriesParams {
 
-    int from;
+    private int from;
 
-    int size;
+    private int size;
 }

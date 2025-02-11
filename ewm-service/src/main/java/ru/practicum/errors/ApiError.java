@@ -1,16 +1,14 @@
 package ru.practicum.errors;
 
 import lombok.Data;
+import ru.practicum.config.DateConfig;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
 public class ApiError {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     List<String> errors;
     String message;
     String reason;
@@ -21,8 +19,8 @@ public class ApiError {
         this.errors = acceptStackTrace(ex);
         this.message = ex.getMessage();
         this.reason = reason;
-        this.status = status;;
-        this.timestamp = LocalDateTime.now().format(FORMATTER);
+        this.status = status;
+        this.timestamp = LocalDateTime.now().format(DateConfig.FORMATTER);
     }
 
     private List<String> acceptStackTrace(Throwable ex) {
