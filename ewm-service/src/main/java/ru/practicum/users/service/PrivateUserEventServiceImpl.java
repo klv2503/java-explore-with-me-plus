@@ -76,10 +76,6 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
 
         updateEventState(event, updateDto.getStateAction());
 
-        if (!event.getState().equals(StateEvent.CANCELED)) {
-            event.setPaid(updateDto.isPaid());
-            event.setParticipantLimit(updateDto.getParticipantLimit());
-        }
         event.setRequestModeration(updateDto.isRequestModeration());
         event.setInitiator(user);
 
@@ -100,6 +96,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
         switch (stateAction) {
             case "CANCEL_REVIEW":
                 event.setState(StateEvent.CANCELED);
+                event.setPaid(false);
                 break;
             case "SEND_TO_REVIEW":
                 event.setState(StateEvent.PENDING);

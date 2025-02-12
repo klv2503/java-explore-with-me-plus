@@ -53,7 +53,7 @@ public class PrivateUserEventsIntegrationTest {
                 () -> assertEquals(eventDto.getLocation(), fullEventDto.getLocation()),
                 () -> assertEquals(eventDto.isPaid(), fullEventDto.isPaid()),
                 () -> assertEquals(eventDto.getParticipantLimit(), fullEventDto.getParticipantLimit()),
-                () -> assertEquals(eventDto.isRequestModeration(), fullEventDto.isRequestModeration()),
+                () -> assertEquals(eventDto.getRequestModeration(), fullEventDto.isRequestModeration()),
                 () -> assertEquals(eventDto.getTitle(), fullEventDto.getTitle())
         );
     }
@@ -98,7 +98,8 @@ public class PrivateUserEventsIntegrationTest {
     void updatingEvent() {
         Event event =  eventRepository.findById(1L).orElseThrow();
         event.setCreatedOn(LocalDateTime.now());
-        UpdateEventUserRequest updateRequest = new UpdateEventUserRequest(1L, "annotation", 1, "descr", "2024-12-31 15:10:05", location,
+        UpdateEventUserRequest updateRequest = new UpdateEventUserRequest(1L, "annotationannotationannotation", 1, "descrdescrdescrdescrdescrdescrdescrdescrdescrdescrdescrdescrdescrdescrdescr",
+                "2025-12-31 15:10:05", location,
                 true, 10, false, "CANCEL_REVIEW", "Title");
 
         EventFullDto updatedEvent = privateUserEventService.updateUserEvent(1L, event.getId(), updateRequest);
@@ -109,7 +110,7 @@ public class PrivateUserEventsIntegrationTest {
                 () -> assertEquals(updateRequest.getCategory(), updatedEvent.getCategory().getId()),
                 () -> assertEquals(updateRequest.getDescription(), updatedEvent.getDescription()),
                 () -> assertEquals(updateRequest.getLocation(), updatedEvent.getLocation()),
-                () -> assertEquals(updateRequest.isPaid(), updatedEvent.isPaid()),
+                () -> assertEquals(updatedEvent.isPaid(), false),
                 () -> assertEquals(event.getParticipantLimit(), updatedEvent.getParticipantLimit()),
                 () -> assertEquals(updateRequest.isRequestModeration(), updatedEvent.isRequestModeration()),
                 () -> assertEquals(updateRequest.getTitle(), updatedEvent.getTitle())

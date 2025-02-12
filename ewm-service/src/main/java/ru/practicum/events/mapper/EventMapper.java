@@ -14,6 +14,7 @@ import ru.practicum.users.dto.UserShortDto;
 import ru.practicum.users.model.User;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
@@ -46,8 +47,8 @@ public class EventMapper {
                 .eventDate(eventTime)
                 .location(dto.getLocation())
                 .paid(dto.isPaid())
-                .participantLimit(dto.getParticipantLimit())
-                .requestModeration(dto.isRequestModeration())
+                .participantLimit(Objects.nonNull(dto.getParticipantLimit()) ? dto.getParticipantLimit() : 0 )
+                .requestModeration(Objects.nonNull(dto.getRequestModeration()) ? dto.getRequestModeration() : true)
                 .initiator(user)
                 .createdOn(LocalDateTime.now())
                 .publishedOn(LocalDateTime.now())
