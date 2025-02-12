@@ -15,7 +15,7 @@ import ru.practicum.MainService;
 import ru.practicum.events.controller.AdminEventController;
 import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.UpdateEventAdminRequest;
-import ru.practicum.events.model.State;
+import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.service.AdminEventService;
 
 import java.nio.charset.StandardCharsets;
@@ -53,7 +53,7 @@ public class AdminEventControllerTest {
             .participantLimit(100)
             .confirmedRequests(10)
             .views(200)
-            .state(State.PENDING)
+            .state(StateEvent.PENDING)
             .createdOn(LocalDateTime.now().toString())
             .publishedOn(LocalDateTime.now().plusHours(1).toString())
             .build();

@@ -1,6 +1,6 @@
 package ru.practicum.events.model;
 
-public enum State {
+public enum StateEvent {
     PENDING,
     PUBLISHED,
     CANCELED

@@ -58,7 +58,7 @@ public class Event {
     private LocalDateTime publishedOn;
 
     @Enumerated(EnumType.STRING)
-    private State state;
+    private StateEvent state;
 
     private int views;
 }

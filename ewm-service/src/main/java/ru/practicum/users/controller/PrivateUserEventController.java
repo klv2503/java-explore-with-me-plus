@@ -51,7 +51,7 @@ public class PrivateUserEventController {
                                                         @PathVariable("eventId") Long eventId,
                                                         @RequestBody UpdateEventUserRequest updateDto) {
         log.info("\nRequest for updating existing event {}", updateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUserEvent(userId, eventId, updateDto));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserEvent(userId, eventId, updateDto));
     }
 
 }
