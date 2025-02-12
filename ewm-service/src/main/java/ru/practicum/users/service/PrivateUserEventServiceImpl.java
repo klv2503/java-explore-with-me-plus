@@ -42,12 +42,6 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
 
     @Override
     public EventFullDto getUserEventById(Long userId, Long eventId) {
-        User user = adminUserService.getUser(userId);
-        System.out.println("USER " + user);
-        Event eventTest = eventRepository.findById(1L).orElseThrow();
-        System.out.println("EVENT " + eventTest);
-
-
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
         return EventMapper.toEventFullDto(event);
