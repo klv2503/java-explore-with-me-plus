@@ -46,8 +46,4 @@ public class EndpointHitService {
         return hits;
     }
 
-    public Integer getViewCount(String uri) {
-        Integer result = endpointHitRepository.getViews(uri);
-        return (result == null) ? 0 : result;
-    }
 }

@@ -10,7 +10,6 @@ import org.springframework.web.client.RestClient;
 import ru.practicum.dto.CreateEndpointHitDto;
 import ru.practicum.dto.ReadEndpointHitDto;
 
-import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +36,12 @@ public class ClientController {
         );
 
         restClient.post()
-                .uri(URI.create("http://stats-server:9090/hit"))
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("http")
+                        .host("stats-server")
+                        .port(9090)
+                        .path("/hit")
+                        .build())
                 .body(dto)
                 .retrieve()
                 .toBodilessEntity();
@@ -50,15 +54,18 @@ public class ClientController {
                                             @RequestParam String end,
                                             @RequestParam List<String> uris,
                                             @RequestParam boolean unique) {
-
+        log.info("\nClientController.getHits start {}, end {}, \nuris {}, unique {}", start, end, uris, unique);
         // Выполняем запрос и получаем коллекцию объектов ReadEndpointHitDto
         ResponseEntity<Collection<ReadEndpointHitDto>> response = restClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("http://stats-server:9090/stats")
-                        .queryParam("param1", start)
-                        .queryParam("param2", end)
-                        .queryParam("param3", String.join(",", uris)) // Преобразуем список в строку
-                        .queryParam("param4", unique)
+                        .scheme("http")
+                        .host("stats-server")
+                        .port(9090)
+                        .path("/stats")
+                        .queryParam("start", start)
+                        .queryParam("end", end)
+                        .queryParam("uris", String.join(",", uris)) // Преобразуем список в строку
+                        .queryParam("unique", unique)
                         .build())
                 .retrieve()
                 .toEntity(new ParameterizedTypeReference<>() {

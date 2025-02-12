@@ -71,13 +71,4 @@ public class EndpointHitRepository {
         return jdbc.query(sql.toString(), params, mapper);
     }
 
-    public Integer getViews(String uri) {
-        String sql = "SELECT COUNT(*) FROM endpoint_hit WHERE uri = :uri";
-        //Если надо считать только с разных ip, то "SELECT COUNT(DISTINCT ip) FROM endpoint_hit WHERE uri = :uri";
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("uri", uri);
-        Integer count = jdbc.queryForObject(sql, params, Integer.class);
-        return (count == null) ? 0 : count;
-    }
-
 }

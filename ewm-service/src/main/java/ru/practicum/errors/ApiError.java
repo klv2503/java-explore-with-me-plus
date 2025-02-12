@@ -16,7 +16,7 @@ public class ApiError {
     String timestamp;
 
     public ApiError(String status, String reason, Throwable ex) {
-        this.errors = List.of(); //acceptStackTrace(ex);
+        this.errors = acceptStackTrace(ex);
         this.message = ex.getMessage();
         this.reason = reason;
         this.status = status;

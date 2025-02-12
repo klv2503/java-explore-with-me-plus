@@ -29,9 +29,9 @@ public class PublicEventController {
 
     @GetMapping
     public ResponseEntity<List<EventShortDto>>
-    getFilteredEvents(@RequestParam String text,
+    getFilteredEvents(@RequestParam(required = false, defaultValue = "") String text,
                       @RequestParam(required = false, defaultValue = "") List<Long> categories,
-                      @RequestParam(required = false, defaultValue = "false") Boolean paid,
+                      @RequestParam(required = false) Boolean paid,
                       @RequestParam(required = false) String rangeStart,
                       @RequestParam(required = false) String rangeEnd,
                       @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
