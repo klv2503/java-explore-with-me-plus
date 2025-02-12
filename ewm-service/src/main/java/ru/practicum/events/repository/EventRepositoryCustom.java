@@ -16,4 +16,6 @@ public interface EventRepositoryCustom {
     List<Event> searchEvents(BooleanBuilder eventCondition, ParticipationRequestStatus status,
                              boolean isAvailable, int page, int size);
 
+    List<Event> findEventsWithConfirmedCount(List<Long> eventIds);
+
 }

@@ -92,17 +92,13 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
 
         // обработка результата
         List<Event> events = new ArrayList<>();
-        for (Tuple tuple : results) {
-            Event e = tuple.get(event);  // Извлекаем событие
-            if (e != null) {
-                Integer confirmedCount = tuple.get(1, Integer.class);  // Извлекаем количество участников
-                e.setConfirmedRequests((confirmedCount == null) ? 0 : confirmedCount);  // пишем в транзиентное поле
-                if (!onlyAvailable ||
-                        e.getParticipantLimit() == 0 ||
-                        e.getParticipantLimit() > e.getConfirmedRequests()) {
-                    events.add(e);
-                }
-            }
+        if (onlyAvailable) {
+            events = tuplesToEvents(event, results).stream()
+                    .filter(ev -> ev.getParticipantLimit() == 0 ||
+                            ev.getParticipantLimit() > ev.getConfirmedRequests())
+                    .toList();
+        } else {
+            events = tuplesToEvents(event, results);
         }
 
         int toIndex = Math.min(from + size, events.size());
@@ -110,5 +106,36 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
             return List.of();
         }
         return events.subList(from, toIndex);
+    }
+
+    @Override
+    public List<Event> findEventsWithConfirmedCount(List<Long> eventIds) {
+        QEvent event = QEvent.event;
+        QParticipationRequest participation = QParticipationRequest.participationRequest;
+
+        JPAQuery<Tuple> query = new JPAQuery<>(em)
+                .select(event, participation.count())
+                .from(event)
+                .leftJoin(participation)
+                .on(participation.event.id.eq(event.id)
+                        .and(participation.status.eq(ParticipationRequestStatus.CONFIRMED)))
+                .where(event.id.in(eventIds))
+                .groupBy(event.id);
+
+        List<Tuple> currentList = query.fetch();
+        return tuplesToEvents(event, currentList);
+    }
+
+    private List<Event> tuplesToEvents(QEvent event, List<Tuple> tuples) {
+        List<Event> events = new ArrayList<>();
+        for (Tuple tuple : tuples) {
+            Event e = tuple.get(event);  // Извлекаем событие
+            if (e != null) {
+                Integer confirmedCount = tuple.get(1, Integer.class);  // Извлекаем количество участников
+                e.setConfirmedRequests((confirmedCount == null) ? 0 : confirmedCount);  // пишем в транзиентное поле
+                events.add(e);
+            }
+        }
+        return events;
     }
 }

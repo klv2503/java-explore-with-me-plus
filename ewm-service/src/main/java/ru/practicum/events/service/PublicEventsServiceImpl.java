@@ -39,18 +39,42 @@ public class PublicEventsServiceImpl implements PublicEventsService {
     @Override
     public Event getEvent(Long id) {
         Event event = eventRepository.findEventWithStatus(id, ParticipationRequestStatus.CONFIRMED);
-        event.setViews(getEventsViews(id, event.getEventDate()));
+        event.setViews(getEventsViews(id, event.getPublishedOn()));
         return event;
     }
 
     @Override
-    public int getEventsViews(long id, LocalDateTime eventDate) {
+    public int getEventsViews(long id, LocalDateTime publishedOn) {
         List<String> uris = List.of("/events/" + id);
-        List<ReadEndpointHitDto> res = clientController.getHits(eventDate.format(DateConfig.FORMATTER),
-                eventDate.format(DateConfig.FORMATTER), uris, false);
+        List<ReadEndpointHitDto> res = clientController.getHits(publishedOn.format(DateConfig.FORMATTER),
+                LocalDateTime.now().format(DateConfig.FORMATTER), uris, false);
         if (CollectionUtils.isEmpty(res))
             throw new RuntimeException("Internal server error");
         return res.getFirst().getHits();
+    }
+
+    public List<Event> getEventsByListIds(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids))
+            return List.of();
+
+        List<Event> events = eventRepository.findEventsWithConfirmedCount(ids);
+        if (CollectionUtils.isEmpty(events))
+            return events;
+
+        LocalDateTime start = events.stream()
+                .map(Event::getPublishedOn)
+                .min(LocalDateTime::compareTo)
+                .orElseThrow(() ->
+                        new RuntimeException("Internal server error during execution PublicEventsServiceImpl"));
+        List<String> uris = events.stream()
+                .map(event -> "/event/" + event.getId())
+                .toList();
+
+        List<ReadEndpointHitDto> acceptedList = clientController.getHits(start.format(DateConfig.FORMATTER),
+                LocalDateTime.now().format(DateConfig.FORMATTER), uris, false);
+        // Заносим значения views в список events
+        viewsToEvents(acceptedList, events);
+        return events;
     }
 
     @Override
@@ -104,8 +128,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
             builder.and(QEvent.event.eventDate.between(start, end));
         }
 
-        List<Event> events = new ArrayList<>();
-        events = eventRepository.searchEvents(builder, ParticipationRequestStatus.CONFIRMED,
+        List<Event> events = eventRepository.searchEvents(builder, ParticipationRequestStatus.CONFIRMED,
                 searchEventsParams.getOnlyAvailable(), searchEventsParams.getFrom(), searchEventsParams.getSize());
         if (events.isEmpty())
             return List.of();
@@ -126,15 +149,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
 
         List<ReadEndpointHitDto> acceptedList = clientController.getHits(searchEventsParams.getRangeStart(),
                 searchEventsParams.getRangeEnd(), uris, false);
-        // Заносим значения views в список events
-        Map<Integer, Integer> workMap = new HashMap<>();
-        for (ReadEndpointHitDto r : acceptedList) {
-            int i = Integer.parseInt(r.getUri().substring(r.getUri().lastIndexOf("/") + 1));
-            workMap.put(i, r.getHits());
-        }
-        for (Event e : events) {
-            e.setViews(workMap.getOrDefault(e.getId(), 0));
-        }
+        viewsToEvents(acceptedList, events);
 
         // Сортировка. Для начала проверяем значение параметра сортировки
         String sortParam;
@@ -158,5 +173,17 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         clientController.saveView(lookEventDto.getIp(), lookEventDto.getUri());
 
         return List.of();
+    }
+
+    public void viewsToEvents(List<ReadEndpointHitDto> viewsList, List<Event> events) {
+        // Заносим значения views в список events
+        Map<Integer, Integer> workMap = new HashMap<>();
+        for (ReadEndpointHitDto r : viewsList) {
+            int i = Integer.parseInt(r.getUri().substring(r.getUri().lastIndexOf("/") + 1));
+            workMap.put(i, r.getHits());
+        }
+        for (Event e : events) {
+            e.setViews(workMap.getOrDefault(e.getId(), 0));
+        }
     }
 }
