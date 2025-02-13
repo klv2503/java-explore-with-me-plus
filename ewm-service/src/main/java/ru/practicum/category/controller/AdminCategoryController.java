@@ -22,8 +22,8 @@ public class AdminCategoryController {
     public final CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<CategoryDto> addUser(@RequestBody @Valid NewCategoryDto inputDto) {
-        log.info("\nRequest for adding of new category {}", inputDto);
+    public ResponseEntity<CategoryDto> addCategory(@RequestBody @Valid NewCategoryDto inputDto) {
+        log.info("\nAdminCategoryController.addCategory: Request for adding of new category {}", inputDto);
         CategoryDto createdCategory = categoryService.addCategory(inputDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
@@ -31,7 +31,7 @@ public class AdminCategoryController {
     @DeleteMapping("/{catId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable
                                                @Min(value = 1, message = "ID must be positive") Long catId) {
-        log.info("\nAccepted request for deleting category {}", catId);
+        log.info("\nAdminCategoryController.deleteCategory: Accepted request for deleting category {}", catId);
         categoryService.deleteCategory(catId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -40,7 +40,7 @@ public class AdminCategoryController {
     public ResponseEntity<CategoryDto> updateCategory(@PathVariable
                                                       @Min(value = 1, message = "ID must be positive") Long catId,
                                                       @RequestBody @Valid NewCategoryDto inputDto) {
-        log.info("\nAccepted request for updating category {}", catId);
+        log.info("\nAdminCategoryController.updateCategory: Accepted request for updating category {}", catId);
         CategoryDto catDto = new CategoryDto(catId, inputDto.getName());
         return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateCategory(catDto));
     }

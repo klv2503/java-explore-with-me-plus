@@ -1,5 +1,6 @@
 package ru.practicum.users.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class PrivateUserEventController {
 
     @PostMapping
     public ResponseEntity<EventFullDto> addNewEvent(@PathVariable("userId") Long userId,
-                                                    @RequestBody NewEventDto eventDto) {
+                                                    @RequestBody @Valid NewEventDto eventDto) {
         log.info("\nRequest for adding new event {}", eventDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.addNewEvent(userId, eventDto));
     }

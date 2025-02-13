@@ -48,7 +48,8 @@ public class PublicEventController {
         SearchEventsParams searchEventsParams =
                 new SearchEventsParams(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         log.info("\nPublicEventController.getFilteredEvents {}", searchEventsParams);
-        return ResponseEntity.status(HttpStatus.OK).body(List.of());
+        List<EventShortDto> result = publicEventsService.getFilteredEvents(searchEventsParams, lookEventDto);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @GetMapping("/{id}")
