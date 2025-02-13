@@ -16,10 +16,20 @@ import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
+import ru.practicum.users.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.users.dto.GetUserEventsDto;
+import ru.practicum.users.dto.ParticipationRequestDto;
+import ru.practicum.users.mapper.ParticipationRequestToDtoMapper;
+import ru.practicum.users.dto.EventRequestStatusUpdateResult;
+import ru.practicum.users.model.ParticipationRequest;
+import ru.practicum.users.model.ParticipationRequestStatus;
+import ru.practicum.users.model.RequestStatus;
 import ru.practicum.users.model.User;
+import ru.practicum.users.repository.ParticipationRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,9 +37,10 @@ import java.util.Optional;
 @AllArgsConstructor
 @Slf4j
 public class PrivateUserEventServiceImpl implements PrivateUserEventService {
-    EventRepository eventRepository;
-    AdminUserService adminUserService;
-    CategoryRepository categoryRepository;
+    private EventRepository eventRepository;
+    private AdminUserService adminUserService;
+    private CategoryRepository categoryRepository;
+    private ParticipationRequestRepository requestRepository;
 
     @Override
     public List<EventShortDto> getUsersEvents(GetUserEventsDto dto) {
@@ -43,7 +54,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
     @Override
     public EventFullDto getUserEventById(Long userId, Long eventId) {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId + " for user " + userId));
         return EventMapper.toEventFullDto(event);
     }
 
@@ -82,6 +93,34 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
         return EventMapper.toEventFullDto(eventRepository.save(event));
     }
 
+    @Override
+    public List<ParticipationRequestDto> getUserEventRequests(Long userId, Long eventId) {
+        eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId + " for user " + userId));
+        return requestRepository.findByEventId(eventId).stream()
+                .map(ParticipationRequestToDtoMapper::mapToDto)
+                .toList();
+    }
+
+    @Override
+    public EventRequestStatusUpdateResult updateUserEventRequest(Long userId, Long eventId, EventRequestStatusUpdateRequest request) {
+        System.out.println("SERVICE " + request);
+        eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId + " for user " + userId));
+        requestRepository.updateStatusByIds(ParticipationRequestStatus.valueOf(request.getStatus()), request.getRequestIds());
+                if (RequestStatus.valueOf(request.getStatus()).equals(RequestStatus.CONFIRMED)) {
+                    return EventRequestStatusUpdateResult.builder()
+                            .confirmedRequests(requestRepository.findByIds(request.getRequestIds()).stream()
+                                    .map(ParticipationRequestToDtoMapper::mapToDto).toList())
+                            .build();
+                } else {
+                    return EventRequestStatusUpdateResult.builder()
+                            .rejectedRequests(requestRepository.findByIds(request.getRequestIds()).stream()
+                                    .map(ParticipationRequestToDtoMapper::mapToDto).toList())
+                            .build();
+                }
+            }
+
     private LocalDateTime parseEventDate(String date) {
         return LocalDateTime.parse(date, DateConfig.FORMATTER);
     }
@@ -96,7 +135,6 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
         switch (stateAction) {
             case "CANCEL_REVIEW":
                 event.setState(StateEvent.CANCELED);
-                event.setPaid(false);
                 break;
             case "SEND_TO_REVIEW":
                 event.setState(StateEvent.PENDING);

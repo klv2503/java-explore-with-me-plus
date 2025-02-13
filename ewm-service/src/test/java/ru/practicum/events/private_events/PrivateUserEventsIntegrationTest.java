@@ -110,7 +110,7 @@ public class PrivateUserEventsIntegrationTest {
                 () -> assertEquals(updateRequest.getCategory(), updatedEvent.getCategory().getId()),
                 () -> assertEquals(updateRequest.getDescription(), updatedEvent.getDescription()),
                 () -> assertEquals(updateRequest.getLocation(), updatedEvent.getLocation()),
-                () -> assertEquals(updatedEvent.isPaid(), false),
+                () -> assertEquals(updatedEvent.isPaid(), true),
                 () -> assertEquals(event.getParticipantLimit(), updatedEvent.getParticipantLimit()),
                 () -> assertEquals(updateRequest.isRequestModeration(), updatedEvent.isRequestModeration()),
                 () -> assertEquals(updateRequest.getTitle(), updatedEvent.getTitle())
