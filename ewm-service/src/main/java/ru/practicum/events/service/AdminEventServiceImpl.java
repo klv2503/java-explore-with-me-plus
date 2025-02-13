@@ -17,7 +17,7 @@ import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStateAction;
 import ru.practicum.events.model.QEvent;
-import ru.practicum.events.model.State;
+import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.validation.AdminEventValidator;
 
@@ -55,7 +55,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         // Фильтрация по состояниям
         if (!CollectionUtils.isEmpty(states)) {
-            builder.and(event.state.in(states.stream().map(State::valueOf).collect(Collectors.toList())));
+            builder.and(event.state.in(states.stream().map(StateEvent::valueOf).collect(Collectors.toList())));
         }
 
         // Фильтрация по категориям
@@ -134,10 +134,10 @@ public class AdminEventServiceImpl implements AdminEventService {
 
     private void updateEventState(Event event, EventStateAction stateAction) {
         if (stateAction.equals(EventStateAction.PUBLISH_EVENT)) {
-            event.setState(State.PUBLISHED);
+            event.setState(StateEvent.PUBLISHED);
             event.setPublishedOn(LocalDateTime.now());
         } else if (stateAction.equals(EventStateAction.REJECT_EVENT)) {
-            event.setState(State.CANCELED);
+            event.setState(StateEvent.CANCELED);
         }
     }
 }

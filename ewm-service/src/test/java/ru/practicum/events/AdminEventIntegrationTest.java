@@ -18,7 +18,7 @@ import ru.practicum.events.dto.UpdateEventAdminRequest;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStateAction;
 import ru.practicum.events.model.Location;
-import ru.practicum.events.model.State;
+import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.service.AdminEventService;
 import ru.practicum.events.validation.AdminEventValidator;
@@ -84,7 +84,7 @@ public class AdminEventIntegrationTest {
         pendingEvent.setRequestModeration(false);
         pendingEvent.setPaid(false);
         pendingEvent.setLocation(location);
-        pendingEvent.setState(State.PENDING);
+        pendingEvent.setState(StateEvent.PENDING);
         pendingEvent.setViews(0);
         pendingEvent.setInitiator(testUser);
         pendingEvent.setCreatedOn(LocalDateTime.now());
@@ -95,7 +95,7 @@ public class AdminEventIntegrationTest {
     void getEvents_ShouldReturnEvents() {
         List<EventFullDto> events = adminEventService.getEvents(
                 Collections.singletonList(testUser.getId()),
-                Collections.singletonList(State.PENDING.name()),
+                Collections.singletonList(StateEvent.PENDING.name()),
                 Collections.singletonList(testCategory.getId()),
                 LocalDateTime.now().minusDays(1),
                 LocalDateTime.now().plusDays(10),
@@ -130,7 +130,7 @@ public class AdminEventIntegrationTest {
         assertThat(updatedEvent.getCategory().getId()).isEqualTo(testCategory2.getId());
         assertThat(updatedEvent.isPaid()).isEqualTo(false);
         assertThat(updatedEvent.getParticipantLimit()).isEqualTo(5);
-        assertThat(updatedEvent.getState()).isEqualTo(State.PUBLISHED);
+        assertThat(updatedEvent.getState()).isEqualTo(StateEvent.PUBLISHED);
     }
 
     @Test
@@ -138,7 +138,7 @@ public class AdminEventIntegrationTest {
         UpdateEventAdminRequest updateRequest = new UpdateEventAdminRequest();
         updateRequest.setStateAction(EventStateAction.REJECT_EVENT);
         EventFullDto updatedEvent = adminEventService.updateEvent(pendingEvent.getId(), updateRequest);
-        assertThat(updatedEvent.getState()).isEqualTo(State.CANCELED);
+        assertThat(updatedEvent.getState()).isEqualTo(StateEvent.CANCELED);
     }
 
     @Test
@@ -178,7 +178,7 @@ public class AdminEventIntegrationTest {
         updateRequest.setStateAction(EventStateAction.PUBLISH_EVENT);
 
         Event event = eventRepository.getReferenceById(pendingEvent.getId());
-        event.setState(State.CANCELED);
+        event.setState(StateEvent.CANCELED);
 
         assertThrows(ForbiddenActionException.class, () ->
                         AdminEventValidator.validateEventStatusUpdate(event, updateRequest));
@@ -190,7 +190,7 @@ public class AdminEventIntegrationTest {
         updateRequest.setStateAction(EventStateAction.REJECT_EVENT);
 
         Event event = eventRepository.getReferenceById(pendingEvent.getId());
-        event.setState(State.PUBLISHED);
+        event.setState(StateEvent.PUBLISHED);
 
         assertThrows(ForbiddenActionException.class, () ->
                         AdminEventValidator.validateEventStatusUpdate(event, updateRequest));
@@ -202,7 +202,7 @@ public class AdminEventIntegrationTest {
         updateRequest.setStateAction(EventStateAction.PUBLISH_EVENT);
 
         Event event = eventRepository.getReferenceById(pendingEvent.getId());
-        event.setState(State.PENDING);
+        event.setState(StateEvent.PENDING);
 
         assertDoesNotThrow(() -> AdminEventValidator.validateEventStatusUpdate(event, updateRequest));
     }

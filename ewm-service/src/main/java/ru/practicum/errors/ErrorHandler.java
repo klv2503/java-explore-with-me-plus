@@ -24,8 +24,8 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handlerMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        return buildErrorResponse(e, HttpStatus.BAD_REQUEST, "Got incorrect requestBody");
+    public ResponseEntity<ApiError> handleValidationExceptions(final MethodArgumentNotValidException e) {
+        return buildErrorResponse(e, HttpStatus.BAD_REQUEST, "Got incorrect pathVariable");
     }
 
     @ExceptionHandler(EntityNotFoundException.class)

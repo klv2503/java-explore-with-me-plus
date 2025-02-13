@@ -15,7 +15,8 @@ INSERT INTO users(name, email) VALUES
 INSERT INTO category(name) VALUES
 ('Category');
 
-
+INSERT INTO locations(lat, lon) VALUES
+(37, 33);
 
 INSERT INTO events(title, annotation, category_id, description, event_date, is_paid, participant_limit, request_moderation, state, views, initiator_id) VALUES
 ('title', 'annotation', 1, 'description', '2025-10-15 15:00:00', true, 50, true, 'PUBLISHED', 30, 3),

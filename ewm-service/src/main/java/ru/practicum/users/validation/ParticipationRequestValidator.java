@@ -3,7 +3,7 @@ package ru.practicum.users.validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.events.model.Event;
-import ru.practicum.events.model.State;
+import ru.practicum.events.model.StateEvent;
 import ru.practicum.users.errors.EventOwnerParticipationException;
 import ru.practicum.users.errors.EventParticipationLimitException;
 import ru.practicum.users.errors.NotPublishedEventParticipationException;
@@ -22,7 +22,7 @@ public class ParticipationRequestValidator {
             return new EventOwnerParticipationException("Event initiator cannot participate in their own event");
         }
 
-        if (event.getState() != State.PUBLISHED) {
+        if (event.getState() != StateEvent.PUBLISHED) {
             return new NotPublishedEventParticipationException("Cannot participate in an unpublished event");
         }
 
