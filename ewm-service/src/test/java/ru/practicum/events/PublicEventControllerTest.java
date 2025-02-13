@@ -128,7 +128,6 @@ public class PublicEventControllerTest {
         String jsonResponse = mvcResult.getResponse().getContentAsString();
         List<EventShortDto> factList = objectMapper.readValue(jsonResponse, new TypeReference<>() {
         });
-        System.out.println(factList);
         assertEquals(1, factList.size());
         assertEquals(eventShortDto, factList.getFirst());
 

@@ -4,9 +4,11 @@ import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.ap.internal.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import ru.practicum.config.DateConfig;
+import ru.practicum.config.StatsClientConfig;
 import ru.practicum.controller.ClientController;
 import ru.practicum.dto.ReadEndpointHitDto;
 import ru.practicum.errors.EventNotPublishedException;
@@ -36,6 +38,14 @@ public class PublicEventsServiceImpl implements PublicEventsService {
     private final ClientController clientController;
 
     private final ParticipationRequestService participationRequestService;
+
+    @Autowired
+    public PublicEventsServiceImpl(EventRepository eventRepository, ParticipationRequestService participationRequestService,
+                                   StatsClientConfig statsClientConfig) {
+        this.eventRepository = eventRepository;
+        this.participationRequestService = participationRequestService;
+        this.clientController = new ClientController(statsClientConfig.getHost(), statsClientConfig.getPort());
+    }
 
     @Override
     public Event getEvent(Long id) {

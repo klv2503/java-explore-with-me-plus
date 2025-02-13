@@ -2,11 +2,9 @@ package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.dto.CreateEndpointHitDto;
@@ -16,20 +14,22 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.*;
 
-
-@RestController
-@RequestMapping("/views")
 @RequiredArgsConstructor
 @Slf4j
 public class ClientController {
 
+    String hostName;
+    String port;
+
     private final RestClient restClient;
 
-    @Autowired
-    private StatsServerConfig statsServerConfig;
+    public ClientController(String hostName, String port) {
+        this.hostName = hostName;
+        this.port = port;
+        this.restClient = RestClient.create();
+    }
 
-    @PostMapping
-    public ResponseEntity<Void> saveView(@RequestParam String addr, @RequestParam String uri) {
+    public ResponseEntity<Void> saveView(String addr, String uri) {
         log.info("\nClientController.saveView addr {}, uri {}", addr, uri);
         CreateEndpointHitDto dto = new CreateEndpointHitDto(
                 "ewm-main-service",
@@ -47,13 +47,8 @@ public class ClientController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping
-    public List<ReadEndpointHitDto> getHits(@RequestParam String start,
-                                            @RequestParam String end,
-                                            @RequestParam List<String> uris,
-                                            @RequestParam boolean unique) {
+    public List<ReadEndpointHitDto> getHits(String start, String end, List<String> uris, boolean unique) {
         log.info("\nClientController.getHits start {}, end {}, \nuris {}, unique {}", start, end, uris, unique);
-        log.info("statsServerConfig: host {}, port {}", statsServerConfig.getHost(), statsServerConfig.getPort());
 
         Map<String, String> params = new HashMap<>();
         params.put("start", start);
@@ -63,9 +58,9 @@ public class ClientController {
         // Выполняем запрос и получаем коллекцию объектов ReadEndpointHitDto
         ResponseEntity<Collection<ReadEndpointHitDto>> response = restClient.get()
                 .uri(buildUri("/stats", params))
-                        .retrieve()
-                        .toEntity(new ParameterizedTypeReference<>() {
-                        });
+                .retrieve()
+                .toEntity(new ParameterizedTypeReference<>() {
+                });
 
         List<ReadEndpointHitDto> respList = Optional.ofNullable(response.getBody())
                 .map(ArrayList::new)
@@ -76,8 +71,8 @@ public class ClientController {
     private URI buildUri(String path, Map<String, String> queryParams) {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
                 .scheme("http")
-                .host("localhost")
-                .port(9090)
+                .host(hostName)
+                .port(port)
                 .path(path);
 
         // Добавляем параметры
