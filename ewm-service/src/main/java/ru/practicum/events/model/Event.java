@@ -30,7 +30,7 @@ public class Event {
     private Category category;
 
     @Transient
-    private int confirmedRequests;
+    private Integer confirmedRequests;
 
     private String description;
 

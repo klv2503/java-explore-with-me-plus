@@ -2,19 +2,19 @@ package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.dto.CreateEndpointHitDto;
 import ru.practicum.dto.ReadEndpointHitDto;
 
+import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @RestController
@@ -24,6 +24,9 @@ import java.util.Optional;
 public class ClientController {
 
     private final RestClient restClient;
+
+    @Autowired
+    private StatsServerConfig statsServerConfig;
 
     @PostMapping
     public ResponseEntity<Void> saveView(@RequestParam String addr, @RequestParam String uri) {
@@ -36,12 +39,7 @@ public class ClientController {
         );
 
         restClient.post()
-                .uri(uriBuilder -> uriBuilder
-                        .scheme("http")
-                        .host("stats-server")
-                        .port(9090)
-                        .path("/hit")
-                        .build())
+                .uri(buildUri("/hit", Map.of()))
                 .body(dto)
                 .retrieve()
                 .toBodilessEntity();
@@ -55,27 +53,39 @@ public class ClientController {
                                             @RequestParam List<String> uris,
                                             @RequestParam boolean unique) {
         log.info("\nClientController.getHits start {}, end {}, \nuris {}, unique {}", start, end, uris, unique);
+        log.info("statsServerConfig: host {}, port {}", statsServerConfig.getHost(), statsServerConfig.getPort());
+
+        Map<String, String> params = new HashMap<>();
+        params.put("start", start);
+        params.put("end", end);
+        params.put("uris", String.join(",", uris));
+        params.put("unique", String.valueOf(unique));
         // Выполняем запрос и получаем коллекцию объектов ReadEndpointHitDto
         ResponseEntity<Collection<ReadEndpointHitDto>> response = restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .scheme("http")
-                        .host("stats-server")
-                        .port(9090)
-                        .path("/stats")
-                        .queryParam("start", start)
-                        .queryParam("end", end)
-                        .queryParam("uris", String.join(",", uris)) // Преобразуем список в строку
-                        .queryParam("unique", unique)
-                        .build())
-                .retrieve()
-                .toEntity(new ParameterizedTypeReference<>() {
-                });
+                .uri(buildUri("/stats", params))
+                        .retrieve()
+                        .toEntity(new ParameterizedTypeReference<>() {
+                        });
 
         List<ReadEndpointHitDto> respList = Optional.ofNullable(response.getBody())
                 .map(ArrayList::new)
                 .orElseGet(ArrayList::new);
         return respList;
     }
+
+    private URI buildUri(String path, Map<String, String> queryParams) {
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(9090)
+                .path(path);
+
+        // Добавляем параметры
+        queryParams.forEach(uriComponentsBuilder::queryParam);
+
+        return uriComponentsBuilder.build().toUri();
+    }
+
 }
 
 

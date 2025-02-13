@@ -40,11 +40,6 @@ public class AdminCategoryControllerTest {
             .name("Football")
             .build();
 
-    private final CategoryDto goodCat2 = CategoryDto.builder()
-            .id(2L)
-            .name("Music")
-            .build();
-
     @Test
     @SneakyThrows
     public void addCategory_whenValidCategoryDto_thenAdd() {

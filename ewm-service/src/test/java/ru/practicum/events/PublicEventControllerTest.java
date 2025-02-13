@@ -24,7 +24,7 @@ import ru.practicum.events.dto.EventShortDto;
 import ru.practicum.events.dto.LookEventDto;
 import ru.practicum.events.dto.SearchEventsParams;
 import ru.practicum.events.model.Location;
-import ru.practicum.events.model.State;
+import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.service.PublicEventsService;
 import ru.practicum.users.dto.UserShortDto;
 
@@ -69,7 +69,7 @@ public class PublicEventControllerTest {
             .location(new Location())
             .participantLimit(0)
             .requestModeration(true)
-            .state(State.PUBLISHED)
+            .state(StateEvent.PUBLISHED)
             .build();
 
     EventShortDto eventShortDto = EventShortDto.builder()

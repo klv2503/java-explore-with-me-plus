@@ -17,7 +17,7 @@ import ru.practicum.events.dto.SearchEventsParams;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.QEvent;
-import ru.practicum.events.model.State;
+import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.users.model.ParticipationRequestStatus;
 import ru.practicum.users.service.ParticipationRequestService;
@@ -48,8 +48,6 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         List<ReadEndpointHitDto> res = clientController.getHits(publishedOn.format(DateConfig.FORMATTER),
                 LocalDateTime.now().format(DateConfig.FORMATTER), uris, false);
         log.info("\nPublicEventsServiceImpl.getEventsViews: res {}", res);
-        if (CollectionUtils.isEmpty(res))
-            throw new RuntimeException("Internal server error");
         return res.getFirst().getHits();
     }
 
@@ -81,7 +79,8 @@ public class PublicEventsServiceImpl implements PublicEventsService {
     public EventFullDto getEventInfo(LookEventDto lookEventDto) {
         log.info("\nPublicEventsServiceImpl.getEventInfo: accepted {}", lookEventDto);
         Event event = getEvent(lookEventDto.getId());
-        if (!event.getState().equals(State.PUBLISHED)) {
+        log.info("\nPublicEventsServiceImpl.getEventsViews: event {}", event);
+        if (!event.getState().equals(StateEvent.PUBLISHED)) {
             throw new EventNotPublishedException("There is no published event id " + event.getId());
         }
         // Получаем views
@@ -104,7 +103,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         }
 
         // Добавляем отбор по статусу PUBLISHED
-        builder.and(QEvent.event.state.eq(State.PUBLISHED));
+        builder.and(QEvent.event.state.eq(StateEvent.PUBLISHED));
         // ... и по списку категорий
         if (!CollectionUtils.isEmpty(searchEventsParams.getCategories()))
             builder.and(QEvent.event.category.id.in(searchEventsParams.getCategories()));
@@ -133,6 +132,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         if (events.isEmpty())
             return List.of();
 
+        log.info("PublicEventsServiceImpl.getFilteredEvents: events {}", events);
         // Если не было установлено rangeEnd, устанавливаем
         if (searchEventsParams.getRangeEnd() == null) {
             searchEventsParams.setRangeEnd(LocalDateTime.now().format(DateConfig.FORMATTER));

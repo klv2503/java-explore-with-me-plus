@@ -48,7 +48,7 @@ public class EventMapper {
                 .eventDate(eventTime)
                 .location(dto.getLocation())
                 .paid(dto.isPaid())
-                .participantLimit(Objects.nonNull(dto.getParticipantLimit()) ? dto.getParticipantLimit() : 0 )
+                .participantLimit(Objects.nonNull(dto.getParticipantLimit()) ? dto.getParticipantLimit() : 0)
                 .requestModeration(Objects.nonNull(dto.getRequestModeration()) ? dto.getRequestModeration() : true)
                 .initiator(user)
                 .createdOn(LocalDateTime.now())
@@ -67,12 +67,12 @@ public class EventMapper {
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
-                .confirmedRequests(event.getConfirmedRequests()) //todo get by ParticipationRequestRepository
+                .confirmedRequests((event.getConfirmedRequests() == null) ? 0 : event.getConfirmedRequests())
                 .eventDate(event.getEventDate().format(DateConfig.FORMATTER))
                 .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
                 .paid(event.isPaid())
                 .title(event.getTitle())
-                .views(event.getViews())
+                .views((event.getViews() == null) ? 0 : event.getViews())
                 .createdOn(event.getCreatedOn().toString())
                 .description(event.getDescription())
                 .location(event.getLocation())
@@ -88,12 +88,12 @@ public class EventMapper {
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
-                .confirmedRequests(event.getConfirmedRequests())
+                .confirmedRequests((event.getConfirmedRequests() == null) ? 0 : event.getConfirmedRequests())
                 .eventDate(event.getEventDate().toString())
                 .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
                 .paid(event.isPaid())
                 .title(event.getTitle())
-                .views(event.getViews())
+                .views((event.getViews() == null) ? 0 : event.getViews())
                 .build();
     }
 
