@@ -14,7 +14,7 @@ import ru.practicum.events.dto.NewEventDto;
 import ru.practicum.events.dto.UpdateEventUserRequest;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
-import ru.practicum.events.model.State;
+import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.users.dto.GetUserEventsDto;
 import ru.practicum.users.model.User;
@@ -42,7 +42,6 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
 
     @Override
     public EventFullDto getUserEventById(Long userId, Long eventId) {
-        User user = adminUserService.getUser(userId);
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
         return EventMapper.toEventFullDto(event);
@@ -75,12 +74,10 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
                     .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + updateDto.getCategory())));
         }
 
-        event.setPaid(updateDto.isPaid());
-        event.setParticipantLimit(updateDto.getParticipantLimit());
+        updateEventState(event, updateDto.getStateAction());
+
         event.setRequestModeration(updateDto.isRequestModeration());
         event.setInitiator(user);
-
-        updateEventState(event, updateDto.getStateAction());
 
         return EventMapper.toEventFullDto(eventRepository.save(event));
     }
@@ -98,10 +95,11 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
 
         switch (stateAction) {
             case "CANCEL_REVIEW":
-                event.setState(State.CANCELED);
+                event.setState(StateEvent.CANCELED);
+                event.setPaid(false);
                 break;
             case "SEND_TO_REVIEW":
-                event.setState(State.PENDING);
+                event.setState(StateEvent.PENDING);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid state action: " + stateAction);

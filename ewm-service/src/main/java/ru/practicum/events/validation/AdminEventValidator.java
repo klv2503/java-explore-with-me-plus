@@ -4,7 +4,7 @@ import ru.practicum.errors.ForbiddenActionException;
 import ru.practicum.events.dto.UpdateEventAdminRequest;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStateAction;
-import ru.practicum.events.model.State;
+import ru.practicum.events.model.StateEvent;
 
 import java.time.LocalDateTime;
 
@@ -24,11 +24,11 @@ public class AdminEventValidator {
         boolean isRejectAction = updateRequest.getStateAction()
                 .equals(EventStateAction.REJECT_EVENT);
 
-        if (isPublishAction && !event.getState().equals(State.PENDING)) {
+        if (isPublishAction && !event.getState().equals(StateEvent.PENDING)) {
             throw new ForbiddenActionException("Cannot publish event. It must be in PENDING state.");
         }
 
-        if (isRejectAction && event.getState().equals(State.PUBLISHED)) {
+        if (isRejectAction && event.getState().equals(StateEvent.PUBLISHED)) {
             throw new ForbiddenActionException("Cannot reject event. It is already published.");
         }
     }

@@ -9,11 +9,12 @@ import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.EventShortDto;
 import ru.practicum.events.dto.NewEventDto;
 import ru.practicum.events.model.Event;
-import ru.practicum.events.model.State;
+import ru.practicum.events.model.StateEvent;
 import ru.practicum.users.dto.UserShortDto;
 import ru.practicum.users.model.User;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
@@ -21,7 +22,7 @@ public class EventMapper {
         return NewEventDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
-                .category(Math.toIntExact(event.getCategory().getId()))
+                .category(event.getCategory().getId())
                 .description(event.getDescription())
                 .eventDate(event.getEventDate().toString())
                 .location(event.getLocation())
@@ -46,12 +47,12 @@ public class EventMapper {
                 .eventDate(eventTime)
                 .location(dto.getLocation())
                 .paid(dto.isPaid())
-                .participantLimit(dto.getParticipantLimit())
-                .requestModeration(dto.isRequestModeration())
+                .participantLimit(Objects.nonNull(dto.getParticipantLimit()) ? dto.getParticipantLimit() : 0 )
+                .requestModeration(Objects.nonNull(dto.getRequestModeration()) ? dto.getRequestModeration() : true)
                 .initiator(user)
                 .createdOn(LocalDateTime.now())
                 .publishedOn(LocalDateTime.now())
-                .state(State.PENDING)
+                .state(StateEvent.PENDING)
                 .views(0)
                 .build();
     }

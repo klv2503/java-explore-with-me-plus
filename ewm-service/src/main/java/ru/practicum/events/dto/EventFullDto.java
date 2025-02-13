@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import ru.practicum.config.DateConfig;
 import ru.practicum.events.model.Location;
-import ru.practicum.events.model.State;
+import ru.practicum.events.model.StateEvent;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -23,5 +23,5 @@ public class EventFullDto extends EventShortDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateConfig.FORMAT)
     private String publishedOn;
     private boolean requestModeration;
-    private State state;
+    private StateEvent state;
 }
