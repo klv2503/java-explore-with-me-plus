@@ -14,11 +14,11 @@ import java.util.List;
 @Builder
 public class TakeHitsDto {
 
-    LocalDateTime start;
+    private LocalDateTime start;
 
-    LocalDateTime end;
+    private LocalDateTime end;
 
-    List<String> uris;
+    private List<String> uris;
 
-    boolean unique;
+    private boolean unique;
 }
