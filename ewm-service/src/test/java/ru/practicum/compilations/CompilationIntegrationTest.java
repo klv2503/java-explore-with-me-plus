@@ -5,10 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,20 +17,15 @@ import ru.practicum.compilations.dto.NewCompilationDto;
 import ru.practicum.compilations.dto.UpdateCompilationRequest;
 import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.compilations.service.CompilationService;
-import ru.practicum.compilations.service.CompilationServiceImpl;
-import ru.practicum.controller.ClientController;
-import ru.practicum.dto.ReadEndpointHitDto;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.service.PublicEventsServiceImpl;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(properties = "classpath:application-test.properties",
@@ -137,7 +128,7 @@ public class CompilationIntegrationTest {
 
         CompilationDto compilation = compilationService.update(2L, updateCompilationRequest);
         List<Long> eventsId = compilation.getEvents().stream()
-                        .map(eventShortDto -> eventShortDto.getId()).toList();
+                .map(eventShortDto -> eventShortDto.getId()).toList();
 
         assertAll(
                 () -> assertEquals(1, compilation.getEvents().size()),

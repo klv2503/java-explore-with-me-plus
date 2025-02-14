@@ -27,7 +27,7 @@ import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,13 +43,13 @@ public class AdminCompilationControllerTest {
     @MockBean
     private CompilationService compilationService;
 
-    private UserShortDto userShortDto = new UserShortDto(3L, "username");
-    private EventShortDto eventShortDto = new EventShortDto(1L, "annotation", null, 5,
+    private final UserShortDto userShortDto = new UserShortDto(3L, "username");
+    private final EventShortDto eventShortDto = new EventShortDto(1L, "annotation", null, 5,
             LocalDateTime.of(2025, 11, 7, 12, 30, 0).toString(), userShortDto, false,
             "title", 15);
-    private NewCompilationDto newCompilationDto = new NewCompilationDto(Set.of(1L, 2L), false, "title");
-    private CompilationDto compilationDto = new CompilationDto(List.of(eventShortDto), 2L, true, "title");
-    private UpdateCompilationRequest updateCompilationRequest = new UpdateCompilationRequest(Set.of(1L, 2L), true,
+    private final CompilationDto compilationDto = new CompilationDto(List.of(eventShortDto), 2L, true, "title");
+    private final NewCompilationDto newCompilationDto = new NewCompilationDto(Set.of(1L, 2L), false, "title");
+    private final UpdateCompilationRequest updateCompilationRequest = new UpdateCompilationRequest(Set.of(1L, 2L), true,
             "title");
 
     @Test
@@ -58,10 +58,10 @@ public class AdminCompilationControllerTest {
         when(compilationService.add(any(NewCompilationDto.class))).thenReturn(compilationDto);
 
         mockMvc.perform(post("/admin/compilations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newCompilationDto))
-                .characterEncoding(StandardCharsets.UTF_8))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newCompilationDto))
+                        .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.events.[0].id", is(eventShortDto.getId()), Long.class))
                 .andExpect(jsonPath("$.id", is(compilationDto.getId()), Long.class))
@@ -75,10 +75,10 @@ public class AdminCompilationControllerTest {
         when(compilationService.update(any(Long.class), any(UpdateCompilationRequest.class))).thenReturn(compilationDto);
 
         mockMvc.perform(patch("/admin/compilations/" + compilationDto.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateCompilationRequest))
-                .characterEncoding(StandardCharsets.UTF_8))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateCompilationRequest))
+                        .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.events.[0].id", is(eventShortDto.getId()), Long.class))
                 .andExpect(jsonPath("$.id", is(compilationDto.getId()), Long.class))
