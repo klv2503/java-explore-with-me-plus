@@ -3,7 +3,7 @@ package ru.practicum.events.service;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.ap.internal.util.Strings;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -22,7 +22,6 @@ import ru.practicum.events.model.QEvent;
 import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.users.model.ParticipationRequestStatus;
-import ru.practicum.users.service.ParticipationRequestService;
 
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
@@ -37,13 +36,9 @@ public class PublicEventsServiceImpl implements PublicEventsService {
 
     private final ClientController clientController;
 
-    private final ParticipationRequestService participationRequestService;
-
     @Autowired
-    public PublicEventsServiceImpl(EventRepository eventRepository, ParticipationRequestService participationRequestService,
-                                   StatsClientConfig statsClientConfig) {
+    public PublicEventsServiceImpl(EventRepository eventRepository, StatsClientConfig statsClientConfig) {
         this.eventRepository = eventRepository;
-        this.participationRequestService = participationRequestService;
         this.clientController = new ClientController(statsClientConfig.getHost(), statsClientConfig.getPort());
     }
 
@@ -56,9 +51,9 @@ public class PublicEventsServiceImpl implements PublicEventsService {
     public int getEventsViews(long id, LocalDateTime publishedOn) {
         List<String> uris = List.of(URLEncoder.encode("/events/" + id));
         List<ReadEndpointHitDto> res = clientController.getHits(publishedOn.format(DateConfig.FORMATTER),
-                LocalDateTime.now().format(DateConfig.FORMATTER), uris, false);
+                LocalDateTime.now().format(DateConfig.FORMATTER), uris, true);
         log.info("\nPublicEventsServiceImpl.getEventsViews: res {}", res);
-        return res.getFirst().getHits();
+        return (CollectionUtils.isEmpty(res)) ? 0 : res.getFirst().getHits();
     }
 
     public List<Event> getEventsByListIds(List<Long> ids) {
@@ -79,7 +74,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
                 .toList();
 
         List<ReadEndpointHitDto> acceptedList = clientController.getHits(start.format(DateConfig.FORMATTER),
-                LocalDateTime.now().format(DateConfig.FORMATTER), uris, false);
+                LocalDateTime.now().format(DateConfig.FORMATTER), uris, true);
         // Заносим значения views в список events
         viewsToEvents(acceptedList, events);
         return events;
@@ -103,6 +98,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
 
     @Override
     public List<EventShortDto> getFilteredEvents(SearchEventsParams searchEventsParams, LookEventDto lookEventDto) {
+        log.info("\nPublicEventsServiceImpl.getFilteredEvents: {}", searchEventsParams);
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -117,6 +113,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         // ... и по списку категорий
         if (!CollectionUtils.isEmpty(searchEventsParams.getCategories()))
             builder.and(QEvent.event.category.id.in(searchEventsParams.getCategories()));
+
         // ... и еще по признаку платные/бесплатные
         if (searchEventsParams.getPaid() != null)
             builder.and(QEvent.event.paid.eq(searchEventsParams.getPaid()));
@@ -136,7 +133,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
             end = LocalDateTime.parse(searchEventsParams.getRangeEnd(), DateConfig.FORMATTER);
             builder.and(QEvent.event.eventDate.between(start, end));
         }
-
+//point control
         List<Event> events = eventRepository.searchEvents(builder, ParticipationRequestStatus.CONFIRMED,
                 searchEventsParams.getOnlyAvailable(), searchEventsParams.getFrom(), searchEventsParams.getSize());
         if (events.isEmpty())
@@ -154,7 +151,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         }
 
         List<ReadEndpointHitDto> acceptedList = clientController.getHits(searchEventsParams.getRangeStart(),
-                searchEventsParams.getRangeEnd(), uris, false);
+                searchEventsParams.getRangeEnd(), uris, true);
         viewsToEvents(acceptedList, events);
 
         // Сортировка. Для начала проверяем значение параметра сортировки

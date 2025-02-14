@@ -17,6 +17,7 @@ import ru.practicum.users.model.QParticipationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -131,8 +132,10 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         for (Tuple tuple : tuples) {
             Event e = tuple.get(event);  // Извлекаем событие
             if (e != null) {
-                Integer confirmedCount = tuple.get(1, Integer.class);  // Извлекаем количество участников
-                e.setConfirmedRequests((confirmedCount == null) ? 0 : confirmedCount);  // пишем в транзиентное поле
+                Integer confirmedCount = Optional.ofNullable(tuple.get(1, Long.class))
+                        .map(Long::intValue)
+                        .orElse(0);  // Извлекаем количество участников
+                e.setConfirmedRequests(confirmedCount);  // пишем в транзиентное поле
                 events.add(e);
             }
         }
