@@ -65,12 +65,12 @@ public class PrivateUserEventController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserEventRequests(userId, eventId));
     }
 
-    @PatchMapping("/{eventId}/requests") ///проблема тут, неправильно мапит EventRequestStatusUpdateRequest(вместо массива принимает счетчик, увеличивающийся на 1 за каждый реквест)
+    @PatchMapping("/{eventId}/requests")
     public ResponseEntity<EventRequestStatusUpdateResult> updateUserEventRequestStatus(@PathVariable("userId") Long userId,
                                                                                        @PathVariable("eventId") Long eventId,
                                                                                        @RequestBody EventRequestStatusUpdateRequest request) {
-        System.out.println("Received requests ASDA: " + request);
-        log.info("\nUpdating user {} event {} request {}", userId, eventId, request);
+        log.info("Received request body: {}", request);
+        log.info("RequestIds: {}, Status: {}", request.getRequestIds(), request.getStatus());
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserEventRequest(userId, eventId, request));
     }
 
