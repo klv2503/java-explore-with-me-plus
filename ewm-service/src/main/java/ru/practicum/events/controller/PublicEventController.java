@@ -13,6 +13,7 @@ import ru.practicum.events.dto.EventShortDto;
 import ru.practicum.events.dto.LookEventDto;
 import ru.practicum.events.dto.SearchEventsParams;
 import ru.practicum.events.service.PublicEventsService;
+import ru.practicum.events.validation.SearchParamsValidator;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -48,6 +49,7 @@ public class PublicEventController {
         SearchEventsParams searchEventsParams =
                 new SearchEventsParams(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         log.info("\nPublicEventController.getFilteredEvents {}", searchEventsParams);
+        SearchParamsValidator.validateSearchParams(searchEventsParams);
         List<EventShortDto> result = publicEventsService.getFilteredEvents(searchEventsParams, lookEventDto);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }

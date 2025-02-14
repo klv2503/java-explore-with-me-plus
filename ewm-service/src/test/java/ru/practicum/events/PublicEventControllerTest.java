@@ -118,8 +118,8 @@ public class PublicEventControllerTest {
         RequestBuilder request = MockMvcRequestBuilders
                 .get("/events")
                 .accept(MediaType.APPLICATION_JSON)
-                .param("rangeStart", secondDate)
-                .param("rangeEnd", thirdDate)
+                .param("rangeStart", thirdDate)
+                .param("rangeEnd", secondDate)
                 .contentType(MediaType.APPLICATION_JSON);
 
         MvcResult mvcResult = mockMvc.perform(request).andExpect(status().isOk()).andReturn();
@@ -141,12 +141,30 @@ public class PublicEventControllerTest {
         assertEquals("", searchParam.getValue().getText(), "text");
         assertTrue(searchParam.getValue().getCategories().isEmpty(), "categories");
         assertNull(searchParam.getValue().getPaid(), "paid");
-        assertEquals(secondDate, searchParam.getValue().getRangeStart(), "rangeStart");
-        assertEquals(thirdDate, searchParam.getValue().getRangeEnd(), "rangeEnd");
+        assertEquals(thirdDate, searchParam.getValue().getRangeStart(), "rangeStart");
+        assertEquals(secondDate, searchParam.getValue().getRangeEnd(), "rangeEnd");
         assertFalse(searchParam.getValue().getOnlyAvailable(), "onlyAvailable");
         assertEquals("EVENT_DATE", searchParam.getValue().getSort(), "sort");
         assertEquals(0, searchParam.getValue().getFrom(), "from");
         assertEquals(10, searchParam.getValue().getSize(), "size");
 
+    }
+
+    @Test
+    @SneakyThrows
+    public void getFilteredEvents_whenCallMethodWithInvalidDate_thenThrow() {
+        List<EventShortDto> expectedList = List.of(eventShortDto);
+
+        when(service.getFilteredEvents(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .thenReturn(expectedList);
+
+        RequestBuilder request = MockMvcRequestBuilders
+                .get("/events")
+                .accept(MediaType.APPLICATION_JSON)
+                .param("rangeStart", secondDate)
+                .param("rangeEnd", thirdDate)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request).andExpect(status().isBadRequest());
     }
 }
