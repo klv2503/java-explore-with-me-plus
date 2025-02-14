@@ -18,6 +18,7 @@ import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.service.PublicEventsServiceImpl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
@@ -117,6 +118,10 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     private List<EventShortDto> getEventsListForDto(Compilation compilation) {
+        if (compilation.getEvents() == null || compilation.getEvents().isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+
         List<EventShortDto> events = publicEventsService.getEventsByListIds(compilation.getEvents().stream().toList())
                 .stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
         log.info("EventsShortDto: {}", events);
