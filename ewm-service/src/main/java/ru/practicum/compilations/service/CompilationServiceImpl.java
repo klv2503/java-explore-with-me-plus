@@ -16,6 +16,7 @@ import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.events.dto.EventShortDto;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.repository.EventRepository;
+import ru.practicum.events.service.PublicEventsServiceImpl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
+    private final PublicEventsServiceImpl publicEventsService;
 
     @Override
     public CompilationDto getById(Long compId) {
@@ -103,20 +105,23 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     private HashMap<Long, EventShortDto> getEventShortDtoForListDto(List<Compilation> compilations) {
-        Set<Long> eventsId = compilations.stream()
+        List<Long> eventsId = compilations.stream()
                 .map(compilation -> compilation.getEvents().stream().toList())
                 .flatMap(List::stream)
-                .collect(Collectors.toSet());
+                .distinct()
+                .collect(Collectors.toList());
 
         //спорный способ вернуть HashMap
-        return new HashMap<>(eventRepository.findAllById(eventsId).stream()
+        return new HashMap<>(publicEventsService.getEventsByListIds(eventsId).stream()
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toMap(EventShortDto::getId, Function.identity())));
     }
 
     private List<EventShortDto> getEventsListForDto(Compilation compilation) {
-        return eventRepository.findAllById(compilation.getEvents().stream().toList())
+        List<EventShortDto> events = publicEventsService.getEventsByListIds(compilation.getEvents().stream().toList())
                 .stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
+        log.info("EventsShortDto: {}", events);
+        return events;
     }
 
 }

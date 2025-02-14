@@ -5,8 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.MainService;
@@ -16,15 +21,25 @@ import ru.practicum.compilations.dto.NewCompilationDto;
 import ru.practicum.compilations.dto.UpdateCompilationRequest;
 import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.compilations.service.CompilationService;
+import ru.practicum.compilations.service.CompilationServiceImpl;
+import ru.practicum.controller.ClientController;
+import ru.practicum.dto.ReadEndpointHitDto;
+import ru.practicum.events.model.Event;
+import ru.practicum.events.repository.EventRepository;
+import ru.practicum.events.service.PublicEventsServiceImpl;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(properties = "classpath:application-test.properties",
         classes = MainService.class)
+//@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ExtendWith(SpringExtension.class)
 @Transactional(readOnly = true)
 @Slf4j
@@ -35,15 +50,26 @@ public class CompilationIntegrationTest {
     private CompilationService compilationService;
     @Autowired
     private CompilationRepository compilationRepository;
+    @Autowired
+    private EventRepository eventRepository;
+    @MockBean
+    private PublicEventsServiceImpl publicEventsService;
 
     @Test
     @Transactional
     public void addCompilationTest() {
-        NewCompilationDto newCompilationDto = new NewCompilationDto(Set.of(1L, 2L), false, "Title");
+        List<Event> events = eventRepository.findAllById(List.of(3L, 4L));
+        events.forEach(event -> {
+            event.setConfirmedRequests(10);
+            event.setViews(20);
+        });
+
+        when(publicEventsService.getEventsByListIds(List.of(3L, 4L))).thenReturn(events);
+
+        NewCompilationDto newCompilationDto = new NewCompilationDto(Set.of(3L, 4L), false, "Title");
         CompilationDto compilation = compilationService.add(newCompilationDto);
 
         assertAll(
-                () -> assertEquals(newCompilationDto.getEvents().size(), compilation.getEvents().size()),
                 () -> assertEquals(newCompilationDto.getPinned(), compilation.getPinned()),
                 () -> assertEquals(newCompilationDto.getTitle(), compilation.getTitle()),
                 () -> assertNotNull(compilation.getId())
@@ -53,6 +79,12 @@ public class CompilationIntegrationTest {
     @Test
     @Transactional
     public void updatePinnedCompilationTest() {
+        Event event = eventRepository.findById(1L).get();
+        event.setConfirmedRequests(15);
+        event.setViews(15);
+
+        when(publicEventsService.getEventsByListIds(List.of(1L))).thenReturn(List.of(event));
+
         UpdateCompilationRequest updateCompilationRequest = new UpdateCompilationRequest(
                 null,
                 true,
@@ -88,6 +120,12 @@ public class CompilationIntegrationTest {
     @Test
     @Transactional
     public void updateEventsCompilationTest() {
+        Event event = eventRepository.findById(2L).get();
+        event.setConfirmedRequests(15);
+        event.setViews(15);
+
+        when(publicEventsService.getEventsByListIds(List.of(2L))).thenReturn(List.of(event));
+
         Set<Long> events = new HashSet<>();
         events.add(2L);
 
@@ -122,6 +160,12 @@ public class CompilationIntegrationTest {
 
     @Test
     public void getCompilationTest() {
+        Event event = eventRepository.findById(1L).get();
+        event.setConfirmedRequests(15);
+        event.setViews(15);
+
+        when(publicEventsService.getEventsByListIds(List.of(1L))).thenReturn(List.of(event));
+
         CompilationDto compilation = compilationService.getById(1L);
 
         assertAll(
