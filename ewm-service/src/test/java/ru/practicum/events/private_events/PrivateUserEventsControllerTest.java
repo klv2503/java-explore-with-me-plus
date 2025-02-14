@@ -143,7 +143,7 @@ public class PrivateUserEventsControllerTest {
     @SneakyThrows
     public void updateUserEvent() {
         UpdateEventUserRequest updateDto = new UpdateEventUserRequest(1L, "aninaninaninaninaninaninaninanin", 1, "descdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdesc",
-                "2026-03-11 15:10:00" , new Location(1L, 33, 33), true,
+                "2026-03-11 15:10:00", new Location(1L, 33, 33), true,
                 1, true, "S", "titile");
 
         when(privateUserEventService.updateUserEvent(any(), anyLong(), any())).thenReturn(eventFullDto);
