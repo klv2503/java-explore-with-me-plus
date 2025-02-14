@@ -14,7 +14,6 @@ import java.util.Set;
 public class UpdateCompilationRequest {
     private Set<Long> events;
     private Boolean pinned;
-    @NotBlank(message = "Field: title. Error: must not be blank. Value: empty")
     @Size(min = 1, max = 50, message = "Field: title. Error: length must be between 1 and 50 symbols.")
     private String title;
 }
