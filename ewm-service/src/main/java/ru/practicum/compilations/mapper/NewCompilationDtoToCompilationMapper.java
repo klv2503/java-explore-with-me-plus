@@ -9,7 +9,7 @@ public class NewCompilationDtoToCompilationMapper {
     public static Compilation mapNewCompilationDtoToCompilation(NewCompilationDto newCompilationDto) {
         return new Compilation(null,
                 newCompilationDto.getEvents(),
-                newCompilationDto.getPinned(),
+                (newCompilationDto.getPinned() != null) ? newCompilationDto.getPinned() : false,
                 newCompilationDto.getTitle());
     }
 }

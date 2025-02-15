@@ -29,6 +29,9 @@ public class Event {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Transient
+    private Integer confirmedRequests;
+
     private String description;
 
     @Column(name = "event_date")
@@ -60,5 +63,5 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private StateEvent state;
 
-    private int views;
+    private Integer views;
 }

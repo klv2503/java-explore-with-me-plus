@@ -36,7 +36,7 @@ public class ParticipationRequestService {
                 .toList();
     }
 
-    public long getConfirmedRequests(long eventId) {
+    public int getConfirmedRequests(long eventId) {
         return requestRepository
                 .countConfirmedRequestsByStatusAndEventId(ParticipationRequestStatus.CONFIRMED, eventId);
     }
