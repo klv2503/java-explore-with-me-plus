@@ -15,6 +15,7 @@ import ru.practicum.users.model.User;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
@@ -24,7 +25,7 @@ public class EventMapper {
                 .annotation(event.getAnnotation())
                 .category(event.getCategory().getId())
                 .description(event.getDescription())
-                .eventDate(event.getEventDate().toString())
+                .eventDate(event.getEventDate().format(DateConfig.FORMATTER))
                 .location(event.getLocation())
                 .paid(event.isPaid())
                 .participantLimit(event.getParticipantLimit())
@@ -47,7 +48,7 @@ public class EventMapper {
                 .eventDate(eventTime)
                 .location(dto.getLocation())
                 .paid(dto.isPaid())
-                .participantLimit(Objects.nonNull(dto.getParticipantLimit()) ? dto.getParticipantLimit() : 0 )
+                .participantLimit(Objects.nonNull(dto.getParticipantLimit()) ? dto.getParticipantLimit() : 0)
                 .requestModeration(Objects.nonNull(dto.getRequestModeration()) ? dto.getRequestModeration() : true)
                 .initiator(user)
                 .createdOn(LocalDateTime.now())
@@ -66,13 +67,13 @@ public class EventMapper {
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
-                .confirmedRequests(0) //todo get by ParticipationRequestRepository
+                .confirmedRequests((event.getConfirmedRequests() == null) ? 0 : event.getConfirmedRequests())
                 .eventDate(event.getEventDate().format(DateConfig.FORMATTER))
                 .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
                 .paid(event.isPaid())
                 .title(event.getTitle())
-                .views(event.getViews())
-                .createdOn(event.getCreatedOn().toString())
+                .views((event.getViews() == null) ? 0 : event.getViews())
+                .createdOn(event.getCreatedOn().format(DateConfig.FORMATTER))
                 .description(event.getDescription())
                 .location(event.getLocation())
                 .participantLimit(event.getParticipantLimit())
@@ -87,12 +88,19 @@ public class EventMapper {
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryDtoMapper.mapCategoryToDto(event.getCategory()))
-                .confirmedRequests(0) //todo get by ParticipationRequestRepository
-                .eventDate(event.getEventDate().toString())
+                .confirmedRequests((event.getConfirmedRequests() == null) ? 0 : event.getConfirmedRequests())
+                .eventDate(event.getEventDate().format(DateConfig.FORMATTER))
                 .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
                 .paid(event.isPaid())
                 .title(event.getTitle())
-                .views(event.getViews())
+                .views((event.getViews() == null) ? 0 : event.getViews())
                 .build();
     }
+
+    public static List<EventShortDto> toListEventShortDto(List<Event> events) {
+        return events.stream()
+                .map(EventMapper::toEventShortDto)
+                .toList();
+    }
+
 }

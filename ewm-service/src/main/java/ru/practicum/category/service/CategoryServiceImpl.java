@@ -26,11 +26,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final NewCategoryMapper newCategoryMapper;
 
-    private final CategoryDtoMapper categoryDtoMapper;
-
     @Override
     public CategoryDto addCategory(NewCategoryDto inputCat) {
-        log.info("\nAdminUserService.addUser {}", inputCat);
+        log.info("\nCategoryServiceImpl.addCategory {}", inputCat);
         Category category = newCategoryMapper.mapNewCategoryDtoToCategory(inputCat);
         return CategoryDtoMapper.mapCategoryToDto(categoryRepository.save(category));
     }

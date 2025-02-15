@@ -2,6 +2,7 @@ package ru.practicum.events.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.apache.logging.log4j.util.Strings;
 import ru.practicum.config.DateConfig;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public class TimeNotEarlyValidator implements ConstraintValidator<TimeNotEarly, 
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) {
+        if (Strings.isEmpty(value)) {
             return false;
         }
         try {
