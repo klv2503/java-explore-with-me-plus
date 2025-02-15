@@ -109,7 +109,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
 
         List<ParticipationRequest> participation = requestRepository.findByIds(request.getRequestIds());
-        for(ParticipationRequest req : participation) {
+        for (ParticipationRequest req : participation) {
             if (!req.getStatus().equals(ParticipationRequestStatus.PENDING)) {
                 throw new ForbiddenActionException("request status should be PENDING");
             }
@@ -122,7 +122,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
                 event.setParticipantLimit(partLimit - request.getRequestIds().size());
                 eventRepository.save(event);
 
-                for(ParticipationRequest req : participation) {
+                for (ParticipationRequest req : participation) {
                     req.setStatus(ParticipationRequestStatus.CONFIRMED);
                 }
 
@@ -134,7 +134,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
                 event.setParticipantLimit(partLimit - request.getRequestIds().size());
                 eventRepository.save(event);
 
-                for(ParticipationRequest req : participation) {
+                for (ParticipationRequest req : participation) {
                     req.setStatus(ParticipationRequestStatus.REJECTED);
                 }
 
@@ -143,25 +143,22 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
                                 .map(ParticipationRequestToDtoMapper::mapToDto).toList())
                         .build();
             }
-        }
-        else  if (partLimit == 0) {
+        } else if (partLimit == 0) {
             throw new ForbiddenActionException("Participation limit is 0");
-        }
-        else {
+        } else {
             List<Long> confirmed = new ArrayList<>();
             List<Long> rejected = new ArrayList<>();
             for (int i = 1; i <= request.getRequestIds().size(); i++) {
                 if (i > partLimit) {
                     rejected.add(request.getRequestIds().get(i));
-                }
-                else confirmed.add(request.getRequestIds().get(i));
+                } else confirmed.add(request.getRequestIds().get(i));
             }
             requestRepository.updateStatusByIds(ParticipationRequestStatus.CONFIRMED, confirmed);
             requestRepository.updateStatusByIds(ParticipationRequestStatus.REJECTED, rejected);
 
             EventRequestStatusUpdateResult res = new EventRequestStatusUpdateResult();
 
-            for(ParticipationRequest req : participation) {
+            for (ParticipationRequest req : participation) {
                 for (Long id : confirmed) {
                     if (Objects.equals(req.getId(), id)) {
                         req.setStatus(ParticipationRequestStatus.CONFIRMED);
