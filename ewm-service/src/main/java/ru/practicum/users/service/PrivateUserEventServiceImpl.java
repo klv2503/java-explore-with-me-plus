@@ -16,20 +16,31 @@ import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
+import ru.practicum.users.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.users.dto.EventRequestStatusUpdateResult;
 import ru.practicum.users.dto.GetUserEventsDto;
+import ru.practicum.users.dto.ParticipationRequestDto;
+import ru.practicum.users.mapper.ParticipationRequestToDtoMapper;
+import ru.practicum.users.model.ParticipationRequest;
+import ru.practicum.users.model.ParticipationRequestStatus;
+import ru.practicum.users.model.RequestUpdateStatus;
 import ru.practicum.users.model.User;
+import ru.practicum.users.repository.ParticipationRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class PrivateUserEventServiceImpl implements PrivateUserEventService {
-    EventRepository eventRepository;
-    AdminUserService adminUserService;
-    CategoryRepository categoryRepository;
+    private EventRepository eventRepository;
+    private AdminUserService adminUserService;
+    private CategoryRepository categoryRepository;
+    private ParticipationRequestRepository requestRepository;
 
     @Override
     public List<EventShortDto> getUsersEvents(GetUserEventsDto dto) {
@@ -82,6 +93,105 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
         return EventMapper.toEventFullDto(eventRepository.save(event));
     }
 
+    @Override
+    public List<ParticipationRequestDto> getUserEventRequests(Long userId, Long eventId) {
+        eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId + " for user " + userId));
+        return requestRepository.findByEventId(eventId).stream()
+                .map(ParticipationRequestToDtoMapper::mapToDto)
+                .toList();
+    }
+
+    @Override
+    public EventRequestStatusUpdateResult updateUserEventRequest(Long userId, Long eventId, EventRequestStatusUpdateRequest request) {
+        User user = adminUserService.getUser(userId);
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+
+        List<ParticipationRequest> participation = requestRepository.findByIds(request.getRequestIds());
+        for(ParticipationRequest req : participation) {
+            if (!req.getStatus().equals(ParticipationRequestStatus.PENDING)) {
+                throw new ForbiddenActionException("request status should be PENDING");
+            }
+        }
+
+        int partLimit = event.getParticipantLimit();
+        if (partLimit >= request.getRequestIds().size()) {
+            requestRepository.updateStatusByIds(ParticipationRequestStatus.valueOf(request.getStatus()), request.getRequestIds());
+            if (RequestUpdateStatus.valueOf(request.getStatus()).equals(RequestUpdateStatus.CONFIRMED)) {
+                event.setParticipantLimit(partLimit - request.getRequestIds().size());
+                eventRepository.save(event);
+
+                for(ParticipationRequest req : participation) {
+                    req.setStatus(ParticipationRequestStatus.CONFIRMED);
+                }
+
+                return EventRequestStatusUpdateResult.builder()
+                        .confirmedRequests(participation.stream()
+                                .map(ParticipationRequestToDtoMapper::mapToDto).toList())
+                        .build();
+            } else {
+                event.setParticipantLimit(partLimit - request.getRequestIds().size());
+                eventRepository.save(event);
+
+                for(ParticipationRequest req : participation) {
+                    req.setStatus(ParticipationRequestStatus.REJECTED);
+                }
+
+                return EventRequestStatusUpdateResult.builder()
+                        .rejectedRequests(participation.stream()
+                                .map(ParticipationRequestToDtoMapper::mapToDto).toList())
+                        .build();
+            }
+        }
+        else  if (partLimit == 0) {
+            throw new ForbiddenActionException("Participation limit is 0");
+        }
+        else {
+            List<Long> confirmed = new ArrayList<>();
+            List<Long> rejected = new ArrayList<>();
+            for (int i = 1; i <= request.getRequestIds().size(); i++) {
+                if (i > partLimit) {
+                    rejected.add(request.getRequestIds().get(i));
+                }
+                else confirmed.add(request.getRequestIds().get(i));
+            }
+            requestRepository.updateStatusByIds(ParticipationRequestStatus.CONFIRMED, confirmed);
+            requestRepository.updateStatusByIds(ParticipationRequestStatus.REJECTED, rejected);
+
+            EventRequestStatusUpdateResult res = new EventRequestStatusUpdateResult();
+
+            for(ParticipationRequest req : participation) {
+                for (Long id : confirmed) {
+                    if (Objects.equals(req.getId(), id)) {
+                        req.setStatus(ParticipationRequestStatus.CONFIRMED);
+                    }
+                }
+                req.setStatus(ParticipationRequestStatus.CANCELED);
+            }
+
+            List<ParticipationRequest> updatedRequestsConfirmed = participation.stream()
+                    .filter(req -> confirmed.contains(req.getId()))
+                    .peek(req -> req.setStatus(ParticipationRequestStatus.CONFIRMED))
+                    .toList();
+
+            List<ParticipationRequest> updatedRequestsRejected = participation.stream()
+                    .filter(req -> rejected.contains(req.getId()))
+                    .peek(req -> req.setStatus(ParticipationRequestStatus.REJECTED))
+                    .toList();
+
+            res.setConfirmedRequests(updatedRequestsConfirmed.stream()
+                    .map(ParticipationRequestToDtoMapper::mapToDto).toList());
+            res.setRejectedRequests(updatedRequestsRejected.stream()
+                    .map(ParticipationRequestToDtoMapper::mapToDto).toList());
+
+            event.setParticipantLimit(0);
+            eventRepository.save(event);
+
+            return res;
+        }
+    }
+
     private LocalDateTime parseEventDate(String date) {
         return LocalDateTime.parse(date, DateConfig.FORMATTER);
     }
@@ -96,7 +206,6 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
         switch (stateAction) {
             case "CANCEL_REVIEW":
                 event.setState(StateEvent.CANCELED);
-                event.setPaid(false);
                 break;
             case "SEND_TO_REVIEW":
                 event.setState(StateEvent.PENDING);

@@ -11,7 +11,10 @@ import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.EventShortDto;
 import ru.practicum.events.dto.NewEventDto;
 import ru.practicum.events.dto.UpdateEventUserRequest;
+import ru.practicum.users.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.users.dto.EventRequestStatusUpdateResult;
 import ru.practicum.users.dto.GetUserEventsDto;
+import ru.practicum.users.dto.ParticipationRequestDto;
 import ru.practicum.users.service.PrivateUserEventService;
 
 import java.util.List;
@@ -53,6 +56,21 @@ public class PrivateUserEventController {
                                                         @Valid @RequestBody UpdateEventUserRequest updateDto) {
         log.info("\nRequest for updating existing event {}", updateDto);
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserEvent(userId, eventId, updateDto));
+    }
+
+    @GetMapping("/{eventId}/requests")
+    public ResponseEntity<List<ParticipationRequestDto>> getUserEventRequests(@PathVariable("userId") Long userId,
+                                                                              @PathVariable("eventId") Long eventId) {
+        log.info("\nRequest getting user {} event {} requests", userId, eventId);
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserEventRequests(userId, eventId));
+    }
+
+    @PatchMapping("/{eventId}/requests")
+    public ResponseEntity<EventRequestStatusUpdateResult> updateUserEventRequestStatus(@PathVariable("userId") Long userId,
+                                                                                       @PathVariable("eventId") Long eventId,
+                                                                                       @RequestBody EventRequestStatusUpdateRequest request) {
+        log.info("RequestIds: {}, Status: {}", request.getRequestIds(), request.getStatus());
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserEventRequest(userId, eventId, request));
     }
 
 }
