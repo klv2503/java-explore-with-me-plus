@@ -21,7 +21,7 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
     Optional<ParticipationRequest> findByIdAndUserId(Long id, Long userId);
 
     @Query("SELECT COUNT(pr) FROM ParticipationRequest pr WHERE pr.status = :status AND pr.event.id = :eventId")
-    long countConfirmedRequestsByStatusAndEventId(@Param("status") ParticipationRequestStatus status, @Param("eventId") Long eventId);
+    int countConfirmedRequestsByStatusAndEventId(@Param("status") ParticipationRequestStatus status, @Param("eventId") Long eventId);
 
     List<ParticipationRequest> findByEventId(Long eventId);
 
@@ -32,6 +32,5 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     @Query("SELECT pr FROM ParticipationRequest pr WHERE pr.id IN :ids")
     List<ParticipationRequest> findByIds(@Param("ids") List<Long> ids);
-  
-    int countConfirmedRequestsByStatusAndEventId(@Param("status") ParticipationRequestStatus status, @Param("eventId") Long eventId);
+
 }
