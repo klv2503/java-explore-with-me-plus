@@ -78,6 +78,14 @@ public class AdminEventServiceImpl implements AdminEventService {
         // Выполнение запроса
         Page<Event> eventsPage = eventRepository.findAllWithBuilder(builder, pageable);
 
+        // Получаем список ID событий
+        List<Long> eventIds = eventsPage.getContent().stream()
+                .map(Event::getId)
+                .collect(Collectors.toList());
+
+        // Получаем события с количеством подтвержденных запросов
+        List<Event> eventsWithConfirmedRequests = eventRepository.findEventsWithConfirmedCount(eventIds);
+
         // Преобразуем сущности Event в EventFullDto
         return eventsPage.getContent().stream()
                 .map(EventMapper::toEventFullDto)

@@ -15,6 +15,7 @@ import ru.practicum.events.dto.NewEventDto;
 import ru.practicum.events.dto.UpdateEventUserRequest;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.Location;
+import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.users.dto.GetUserEventsDto;
 import ru.practicum.users.service.PrivateUserEventService;
@@ -97,12 +98,13 @@ public class PrivateUserEventsIntegrationTest {
     @Test
     void updatingEvent() {
         Event event =  eventRepository.findById(1L).orElseThrow();
+        event.setState(StateEvent.CANCELED);
         event.setCreatedOn(LocalDateTime.now());
         UpdateEventUserRequest updateRequest = new UpdateEventUserRequest(1L, "annotationannotationannotation", 1, "descrdescrdescrdescrdescrdescrdescrdescrdescrdescrdescrdescrdescrdescrdescr",
                 "2025-12-31 15:10:05", location,
-                true, 10, false, "CANCEL_REVIEW", "Title");
+                true, 10, true, "CANCEL_REVIEW", "Title");
 
-        EventFullDto updatedEvent = privateUserEventService.updateUserEvent(1L, event.getId(), updateRequest);
+        EventFullDto updatedEvent = privateUserEventService.updateUserEvent(event.getInitiator().getId(), event.getId(), updateRequest);
 
         assertAll(
                 () -> assertEquals(updateRequest.getTitle(), updatedEvent.getTitle()),
