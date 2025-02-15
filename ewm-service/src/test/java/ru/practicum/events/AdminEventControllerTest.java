@@ -60,7 +60,7 @@ public class AdminEventControllerTest {
 
     private final UpdateEventAdminRequest updateEventRequest = UpdateEventAdminRequest.builder()
             .title("Updated Title")
-            .description("Updated Description")
+            .description("12345".repeat(5))
             .eventDate(LocalDateTime.now().plusDays(2))
             .paid(false)
             .participantLimit(50)
@@ -98,10 +98,10 @@ public class AdminEventControllerTest {
                 .thenReturn(eventDto);
 
         mockMvc.perform(patch("/admin/events/{eventId}", eventDto.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateEventRequest))
-                .characterEncoding(StandardCharsets.UTF_8))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateEventRequest))
+                        .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(eventDto.getId()), Long.class))
                 .andExpect(jsonPath("$.title", is(eventDto.getTitle())))

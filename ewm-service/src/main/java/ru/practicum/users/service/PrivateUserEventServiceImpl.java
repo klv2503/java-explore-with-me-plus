@@ -74,6 +74,10 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
 
+        if (!Objects.equals(event.getInitiator().getId(), userId)) {
+            throw new ForbiddenActionException("User is not the event creator");
+        }
+
         Optional.ofNullable(updateDto.getTitle()).ifPresent(event::setTitle);
         Optional.ofNullable(updateDto.getAnnotation()).ifPresent(event::setAnnotation);
         Optional.ofNullable(updateDto.getDescription()).ifPresent(event::setDescription);
@@ -105,8 +109,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
     @Override
     public EventRequestStatusUpdateResult updateUserEventRequest(Long userId, Long eventId, EventRequestStatusUpdateRequest request) {
         User user = adminUserService.getUser(userId);
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+        Event event = getEventWithConfirmedRequests(eventId);
 
         List<ParticipationRequest> participation = requestRepository.findByIds(request.getRequestIds());
         for (ParticipationRequest req : participation) {
@@ -116,11 +119,12 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
         }
 
         int partLimit = event.getParticipantLimit();
-        if (partLimit >= request.getRequestIds().size()) {
+        int confPart = Objects.nonNull(event.getConfirmedRequests()) ? event.getConfirmedRequests() : 0;
+        int diff = partLimit - confPart;
+
+        if (diff >= request.getRequestIds().size()) {
             requestRepository.updateStatusByIds(ParticipationRequestStatus.valueOf(request.getStatus()), request.getRequestIds());
             if (RequestUpdateStatus.valueOf(request.getStatus()).equals(RequestUpdateStatus.CONFIRMED)) {
-                event.setParticipantLimit(partLimit - request.getRequestIds().size());
-                eventRepository.save(event);
 
                 for (ParticipationRequest req : participation) {
                     req.setStatus(ParticipationRequestStatus.CONFIRMED);
@@ -131,9 +135,6 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
                                 .map(ParticipationRequestToDtoMapper::mapToDto).toList())
                         .build();
             } else {
-                event.setParticipantLimit(partLimit - request.getRequestIds().size());
-                eventRepository.save(event);
-
                 for (ParticipationRequest req : participation) {
                     req.setStatus(ParticipationRequestStatus.REJECTED);
                 }
@@ -143,13 +144,13 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
                                 .map(ParticipationRequestToDtoMapper::mapToDto).toList())
                         .build();
             }
-        } else if (partLimit == 0) {
+        } else if (diff == 0) {
             throw new ForbiddenActionException("Participation limit is 0");
         } else {
             List<Long> confirmed = new ArrayList<>();
             List<Long> rejected = new ArrayList<>();
             for (int i = 1; i <= request.getRequestIds().size(); i++) {
-                if (i > partLimit) {
+                if (i > diff) {
                     rejected.add(request.getRequestIds().get(i));
                 } else confirmed.add(request.getRequestIds().get(i));
             }
@@ -182,9 +183,6 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
             res.setRejectedRequests(updatedRequestsRejected.stream()
                     .map(ParticipationRequestToDtoMapper::mapToDto).toList());
 
-            event.setParticipantLimit(0);
-            eventRepository.save(event);
-
             return res;
         }
     }
@@ -210,5 +208,9 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
             default:
                 throw new IllegalArgumentException("Invalid state action: " + stateAction);
         }
+    }
+
+    public Event getEventWithConfirmedRequests(Long eventId) {
+        return eventRepository.findEventWithStatus(eventId, ParticipationRequestStatus.CONFIRMED);
     }
 }
