@@ -1,5 +1,6 @@
 package ru.practicum.events.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class AdminEventController {
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventFullDto> updateEvent(
             @PathVariable Long eventId,
-            @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
+           @Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
         log.debug("Admin is updating event {} with data: {}", eventId, updateEventAdminRequest);
         EventFullDto dto = adminEventService.updateEvent(eventId, updateEventAdminRequest);
         log.info("Event {} successfully updated", eventId);
