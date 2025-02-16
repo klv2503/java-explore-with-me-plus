@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.dto.CreateEndpointHitDto;
+import ru.practicum.dto.ManyEndPointDto;
 import ru.practicum.dto.ReadEndpointHitDto;
 
 import java.net.URI;
@@ -66,6 +67,24 @@ public class ClientController {
                 .map(ArrayList::new)
                 .orElseGet(ArrayList::new);
         return respList;
+    }
+
+    public ResponseEntity<Void> saveHitsGroup(List<String> uris, String ip) {
+        log.info("\nClientController.saveHitsGroup uris {}, addr {}", uris, ip);
+
+        ManyEndPointDto manyEndPointDto = ManyEndPointDto.builder()
+                .uris(uris)
+                .ip(ip)
+                .build();
+
+        log.info("\nClientController.saveHitsGroup many {}", manyEndPointDto);
+
+        restClient.post()
+                .uri(buildUri("/hit/group", Map.of()))
+                .body(manyEndPointDto)
+                .retrieve()
+                .toBodilessEntity();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     private URI buildUri(String path, Map<String, String> queryParams) {
