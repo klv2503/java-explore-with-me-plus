@@ -57,6 +57,7 @@ public class EndpointHitService {
                 .map(u -> EndpointHit.builder()
                         .app(app)
                         .uri(u)
+                        .ip(many.getIp())
                         .timestamp(nun)
                         .build())
                 .toList();
