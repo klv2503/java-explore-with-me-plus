@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -26,6 +27,12 @@ public class ErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidationExceptions(final MethodArgumentNotValidException e) {
         return buildErrorResponse(e, HttpStatus.BAD_REQUEST, "Got incorrect pathVariable");
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiError>
+    handleMissingServletRequestParameterException(final MissingServletRequestParameterException e) {
+        return buildErrorResponse(e, HttpStatus.BAD_REQUEST, "Missing required parameter");
     }
 
     @ExceptionHandler(EntityNotFoundException.class)

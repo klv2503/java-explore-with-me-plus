@@ -78,6 +78,9 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
             throw new ForbiddenActionException("User is not the event creator");
         }
 
+        if (Objects.equals(event.getState(), StateEvent.PUBLISHED)) {
+            throw new ForbiddenActionException("Changing of published event is forbidden.");
+        }
         Optional.ofNullable(updateDto.getTitle()).ifPresent(event::setTitle);
         Optional.ofNullable(updateDto.getAnnotation()).ifPresent(event::setAnnotation);
         Optional.ofNullable(updateDto.getDescription()).ifPresent(event::setDescription);
