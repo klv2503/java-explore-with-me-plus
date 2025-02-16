@@ -135,8 +135,10 @@ public class PublicEventsServiceImpl implements PublicEventsService {
 
         List<Event> events = eventRepository.searchEvents(builder, ParticipationRequestStatus.CONFIRMED,
                 searchEventsParams.getOnlyAvailable(), searchEventsParams.getFrom(), searchEventsParams.getSize());
-        if (events.isEmpty())
+        if (events.isEmpty()) {
+            clientController.saveView(lookEventDto.getIp(), "/events");
             return List.of();
+        }
 
         log.info("PublicEventsServiceImpl.getFilteredEvents: events {}", events);
         // Если не было установлено rangeEnd, устанавливаем
@@ -172,6 +174,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
                     .toList();
         }
 
+        uris.add("/events");
         clientController.saveHitsGroup(uris, lookEventDto.getIp());
         log.info("\n Final list {}", sortedEvents);
         return EventMapper.toListEventShortDto(sortedEvents);
