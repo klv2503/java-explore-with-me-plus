@@ -1,5 +1,6 @@
 package ru.practicum.controller;
 
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import ru.practicum.dto.CreateEndpointHitDto;
 import ru.practicum.dto.TakeHitsDto;
 import ru.practicum.dto.ReadEndpointHitDto;
 import ru.practicum.service.EndpointHitService;
+import ru.practicum.validation.PairOfDateValidation;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -53,6 +55,9 @@ public class StatsController {
                 .uris(uris.orElse(List.of()))
                 .unique(unique)
                 .build();
+        if (!PairOfDateValidation.isValid(takeHitsDto)) {
+            throw new ConstraintViolationException("Request dates are incorrect.", null);
+        }
         log.info("\nStatsController.getHits accepted {}", takeHitsDto);
         return ResponseEntity.status(HttpStatus.OK).body(endpointHitService.getHits(takeHitsDto));
     }
