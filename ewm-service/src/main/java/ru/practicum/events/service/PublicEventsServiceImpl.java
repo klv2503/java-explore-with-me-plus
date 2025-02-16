@@ -132,7 +132,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
             end = LocalDateTime.parse(searchEventsParams.getRangeEnd(), DateConfig.FORMATTER);
             builder.and(QEvent.event.eventDate.between(start, end));
         }
-//point control
+
         List<Event> events = eventRepository.searchEvents(builder, ParticipationRequestStatus.CONFIRMED,
                 searchEventsParams.getOnlyAvailable(), searchEventsParams.getFrom(), searchEventsParams.getSize());
         if (events.isEmpty())
@@ -172,7 +172,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
                     .toList();
         }
 
-        clientController.saveView(lookEventDto.getIp(), lookEventDto.getUri());
+        clientController.saveHitsGroup(uris, lookEventDto.getIp());
         log.info("\n Final list {}", sortedEvents);
         return EventMapper.toListEventShortDto(sortedEvents);
     }

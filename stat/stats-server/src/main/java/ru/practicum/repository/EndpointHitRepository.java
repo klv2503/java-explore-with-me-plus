@@ -71,4 +71,28 @@ public class EndpointHitRepository {
         return jdbc.query(sql.toString(), params, mapper);
     }
 
+    public void saveAll(List<EndpointHit> listHits) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO endpoint_hit (app, uri, ip, timestamp) VALUES ");
+
+        int lastIndex = listHits.size() - 1;
+        for (var i = 0; i < lastIndex; i++) {
+            String val = "(:app" + i + ", :uri" + i + ", :ip" + i + ", :timestamp)" + i + ", ";
+            sql.append(val);
+        }
+
+        sql.append("(:app" + lastIndex + ", :uri" + lastIndex + ", :ip" + lastIndex + ", :timestamp)" + lastIndex + ";");
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+
+        for (var i = 0; i <= lastIndex; i++) {
+            params.addValue("app" + i, listHits.get(i).getApp());
+            params.addValue("uri" + i, listHits.get(i).getUri());
+            params.addValue("ip" + i, listHits.get(i).getIp());
+            params.addValue("timestamp" + i, Timestamp.valueOf(listHits.get(i).getTimestamp()));
+        }
+
+        jdbc.update(sql.toString(), params);
+    }
+
 }

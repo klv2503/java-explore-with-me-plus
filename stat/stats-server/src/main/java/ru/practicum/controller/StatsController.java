@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.config.DateConfig;
 import ru.practicum.dto.CreateEndpointHitDto;
+import ru.practicum.dto.ManyEndPointDto;
 import ru.practicum.dto.TakeHitsDto;
 import ru.practicum.dto.ReadEndpointHitDto;
 import ru.practicum.service.EndpointHitService;
@@ -55,5 +56,13 @@ public class StatsController {
                 .build();
         log.info("\nStatsController.getHits accepted {}", takeHitsDto);
         return ResponseEntity.status(HttpStatus.OK).body(endpointHitService.getHits(takeHitsDto));
+    }
+
+    @PostMapping("/hit/group")
+    public ResponseEntity<Void> saveHitGroup(@RequestBody ManyEndPointDto many) {
+        log.info("\nStatsController.saveHitsGroup many {}", many);
+
+        endpointHitService.saveHitsGroup(many);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
