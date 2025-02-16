@@ -15,8 +15,6 @@ import ru.practicum.events.dto.SearchEventsParams;
 import ru.practicum.events.service.PublicEventsService;
 import ru.practicum.events.validation.SearchParamsValidator;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -40,7 +38,7 @@ public class PublicEventController {
                       @RequestParam(required = false, defaultValue = "0") int from,
                       @RequestParam(required = false, defaultValue = "10") int size,
                       HttpServletRequest request) {
-        String encodedUri = URLEncoder.encode(request.getRequestURI(), StandardCharsets.UTF_8);
+        String encodedUri = request.getRequestURI();
         LookEventDto lookEventDto = LookEventDto.builder()
                 .id(null)
                 .uri(encodedUri)
@@ -58,7 +56,7 @@ public class PublicEventController {
     public ResponseEntity<EventFullDto> getEventInfo(@PathVariable
                                                      @Min(value = 1, message = "ID must be positive") Long id,
                                                      HttpServletRequest request) {
-        String encodedUri = URLEncoder.encode(request.getRequestURI(), StandardCharsets.UTF_8);
+        String encodedUri = request.getRequestURI();
         LookEventDto lookEventDto = LookEventDto.builder()
                 .id(id)
                 .uri(encodedUri)
