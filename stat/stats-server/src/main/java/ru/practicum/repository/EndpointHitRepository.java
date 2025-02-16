@@ -77,11 +77,11 @@ public class EndpointHitRepository {
 
         int lastIndex = listHits.size() - 1;
         for (var i = 0; i < lastIndex; i++) {
-            String val = "(:app" + i + ", :uri" + i + ", :ip" + i + ", :timestamp)" + i + ", ";
+            String val = "(:app" + i + ", :uri" + i + ", :ip" + i + ", :timestamp" + i + "), ";
             sql.append(val);
         }
 
-        sql.append("(:app" + lastIndex + ", :uri" + lastIndex + ", :ip" + lastIndex + ", :timestamp)" + lastIndex + ";");
+        sql.append("(:app" + lastIndex + ", :uri" + lastIndex + ", :ip" + lastIndex + ", :timestamp" + lastIndex + ");");
 
         MapSqlParameterSource params = new MapSqlParameterSource();
 
