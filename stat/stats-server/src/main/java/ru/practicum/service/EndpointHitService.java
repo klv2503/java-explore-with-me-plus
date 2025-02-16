@@ -1,6 +1,5 @@
 package ru.practicum.service;
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,9 +42,10 @@ public class EndpointHitService {
     }
 
     public Collection<ReadEndpointHitDto> getHits(TakeHitsDto takeHitsDto) {
-        if (!takeHitsDto.getStart().isBefore(takeHitsDto.getEnd())) {
-            throw new ConstraintViolationException("Date of end is earlier as date of start", null);
+        if (takeHitsDto.getEnd().isBefore(takeHitsDto.getStart())) {
+            throw new IllegalArgumentException("Request dates are incorrect.", null);
         }
+
         Collection<ReadEndpointHitDto> hits = endpointHitRepository.get(takeHitsDto).stream()
                 .sorted(Comparator.comparingInt(ReadEndpointHitDto::getHits)).toList().reversed();
 
