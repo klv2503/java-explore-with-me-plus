@@ -58,7 +58,7 @@ public class PublicEventController {
     public ResponseEntity<EventFullDto> getEventInfo(@PathVariable
                                                      @Min(value = 1, message = "ID must be positive") Long id,
                                                      HttpServletRequest request) {
-        String encodedUri = URLEncoder.encode(request.getRequestURI(), StandardCharsets.UTF_8);
+        String encodedUri = request.getRequestURI();
         LookEventDto lookEventDto = LookEventDto.builder()
                 .id(id)
                 .uri(encodedUri)

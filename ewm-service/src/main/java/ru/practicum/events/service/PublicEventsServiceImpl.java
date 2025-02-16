@@ -23,7 +23,6 @@ import ru.practicum.events.model.StateEvent;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.users.model.ParticipationRequestStatus;
 
-import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -49,7 +48,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
 
     @Override
     public int getEventsViews(long id, LocalDateTime publishedOn) {
-        List<String> uris = List.of(URLEncoder.encode("/events/" + id));
+        List<String> uris = List.of("/events/" + id);
         List<ReadEndpointHitDto> res = clientController.getHits(publishedOn.format(DateConfig.FORMATTER),
                 LocalDateTime.now().format(DateConfig.FORMATTER), uris, true);
         log.info("\nPublicEventsServiceImpl.getEventsViews: res {}", res);
@@ -70,7 +69,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
                 .orElseThrow(() ->
                         new RuntimeException("Internal server error during execution PublicEventsServiceImpl"));
         List<String> uris = events.stream()
-                .map(event -> URLEncoder.encode("/event/" + event.getId()))
+                .map(event -> "/event/" + event.getId())
                 .toList();
 
         List<ReadEndpointHitDto> acceptedList = clientController.getHits(start.format(DateConfig.FORMATTER),
@@ -147,7 +146,7 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         // Формируем список uris
         List<String> uris = new ArrayList<>();
         for (Event e : events) {
-            uris.add(URLEncoder.encode("/events/" + e.getId()));
+            uris.add("/events/" + e.getId());
         }
 
         List<ReadEndpointHitDto> acceptedList = clientController.getHits(searchEventsParams.getRangeStart(),
