@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.compilations.dto.CompilationDto;
 import ru.practicum.compilations.dto.Filter;
 import ru.practicum.compilations.dto.NewCompilationDto;
@@ -31,6 +32,7 @@ import static ru.practicum.compilations.mapper.NewCompilationDtoToCompilationMap
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;

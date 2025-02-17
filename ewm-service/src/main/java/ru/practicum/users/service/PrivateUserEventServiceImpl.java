@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.config.DateConfig;
 import ru.practicum.errors.ForbiddenActionException;
@@ -36,6 +37,7 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 @Slf4j
+@Transactional
 public class PrivateUserEventServiceImpl implements PrivateUserEventService {
     private EventRepository eventRepository;
     private AdminUserService adminUserService;

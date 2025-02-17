@@ -19,7 +19,6 @@ public class NewEventDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
-    @NotNull
     @NotBlank
     @Size(min = 20, max = 2000)
     private String annotation;
@@ -27,7 +26,6 @@ public class NewEventDto {
     @NotNull
     private long category;
 
-    @NotNull
     @NotBlank
     @Size(min = 20, max = 7000)
     private String description;
@@ -46,7 +44,6 @@ public class NewEventDto {
 
     private Boolean requestModeration;
 
-    @NotNull
     @NotBlank
     @Size(min = 3, max = 120)
     private String title;
