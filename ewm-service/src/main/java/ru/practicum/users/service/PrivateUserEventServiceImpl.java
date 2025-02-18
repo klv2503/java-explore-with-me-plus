@@ -37,7 +37,7 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 public class PrivateUserEventServiceImpl implements PrivateUserEventService {
     private EventRepository eventRepository;
     private AdminUserService adminUserService;
@@ -61,6 +61,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto addNewEvent(Long userId, NewEventDto eventDto) {
         User user = adminUserService.getUser(userId);
         Event event = EventMapper.dtoToEvent(eventDto, user);
@@ -71,6 +72,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto updateUserEvent(Long userId, Long eventId, UpdateEventUserRequest updateDto) {
         User user = adminUserService.getUser(userId);
         Event event = eventRepository.findById(eventId)
@@ -112,6 +114,7 @@ public class PrivateUserEventServiceImpl implements PrivateUserEventService {
     }
 
     @Override
+    @Transactional
     public EventRequestStatusUpdateResult updateUserEventRequest(Long userId, Long eventId, EventRequestStatusUpdateRequest request) {
         User user = adminUserService.getUser(userId);
         Event event = getEventWithConfirmedRequests(eventId);

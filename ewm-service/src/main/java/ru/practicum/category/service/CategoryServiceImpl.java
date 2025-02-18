@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -29,6 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final NewCategoryMapper newCategoryMapper;
 
     @Override
+    @Transactional
     public CategoryDto addCategory(NewCategoryDto inputCat) {
         log.info("\nCategoryServiceImpl.addCategory {}", inputCat);
         Category category = newCategoryMapper.mapNewCategoryDtoToCategory(inputCat);
@@ -36,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategory(long id) {
         if (!categoryRepository.existsById(id))
             throw new EntityNotFoundException("Category with " + id + " not found");
@@ -43,6 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDto updateCategory(CategoryDto inputCat) {
         if (!categoryRepository.existsById(inputCat.getId()))
             throw new EntityNotFoundException("Category with " + inputCat.getId() + " not found");

@@ -32,7 +32,7 @@ import static ru.practicum.compilations.mapper.NewCompilationDtoToCompilationMap
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
@@ -49,6 +49,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public CompilationDto add(NewCompilationDto newCompilationDto) {
         log.info("Add compilation {}", newCompilationDto);
         Compilation newCompilation = compilationRepository
@@ -57,6 +58,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public CompilationDto update(Long compId, UpdateCompilationRequest updateCompilationRequest) {
         log.info("Update compilation with id {}", compId);
         Compilation compilation = getCompilation(compId);
@@ -77,6 +79,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public void delete(Long compId) {
         log.info("Delete compilation with id {}", compId);
         if (!compilationRepository.existsById(compId)) {
