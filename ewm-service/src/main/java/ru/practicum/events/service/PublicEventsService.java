@@ -19,4 +19,6 @@ public interface PublicEventsService {
 
     List<EventShortDto> getFilteredEvents(SearchEventsParams searchEventsParams, LookEventDto lookEventDto);
 
+    Event getEventAnyStatusWithViews(Long id);
+
 }
