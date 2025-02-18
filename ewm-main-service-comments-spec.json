@@ -59,10 +59,13 @@
             }
           },
           "400": {
-            "description": "Ошибка валидации"
+            "description": "Ошибка валидации или некорректные данные"
           },
           "401": {
             "description": "Требуется авторизация"
+          },
+          "409": {
+            "description": "Нарушение целостности данных или невозможность выполнения действия"
           }
         }
       }
@@ -111,17 +114,23 @@
         ],
         "responses": {
           "200": {
-            "description": "Список комментариев с пагинацией",
+            "description": "Список комментариев",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CommentPagedDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Comment"
+                  }
                 }
               }
             }
           },
           "400": {
-            "description": "Ошибка запроса"
+            "description": "Ошибка запроса или некорректные параметры"
+          },
+          "404": {
+            "description": "Событие не найдено"
           }
         }
       }
@@ -177,7 +186,7 @@
             }
           },
           "400": {
-            "description": "Ошибка валидации"
+            "description": "Ошибка валидации или некорректный запрос"
           },
           "403": {
             "description": "Доступ запрещён"
@@ -254,86 +263,22 @@
           }
         }
       },
-      "CommentOutputDto": {
+      "ApiError": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "user": {
-            "$ref": "#/components/schemas/User"
-          },
-          "event": {
-            "$ref": "#/components/schemas/EventShortDto"
-          },
-          "text": {
-            "type": "string"
-          },
-          "created": {
-            "type": "string",
-            "format": "date-time"
-          },
           "status": {
             "type": "string",
-            "enum": [
-              "PUBLISHED",
-              "DELETED",
-              "BANNED"
-            ]
+            "description": "HTTP статус"
+          },
+          "message": {
+            "type": "string",
+            "description": "Описание ошибки"
+          },
+          "exception": {
+            "type": "string",
+            "description": "Стек вызовов исключения"
           }
         }
-      },
-      "CommentPagedDto": {
-        "type": "object",
-        "properties": {
-          "comments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CommentOutputDto"
-            }
-          },
-          "page": {
-            "type": "integer"
-          },
-          "total": {
-            "type": "integer"
-          }
-        }
-      },
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "username": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          }
-        }
-      },
-      "EventShortDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          }
-        }
-      },
-      "CommentsOrder": {
-        "type": "string",
-        "enum": [
-          "NEWEST",
-          "OLDEST"
-        ]
       }
     }
   }
