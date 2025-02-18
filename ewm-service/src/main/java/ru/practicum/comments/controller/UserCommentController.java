@@ -10,6 +10,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.comments.dto.CommentDto;
 import ru.practicum.comments.dto.CommentOutputDto;
+import ru.practicum.comments.dto.CommentPagedDto;
+import ru.practicum.comments.model.CommentsOrder;
 import ru.practicum.comments.model.CommentsStatus;
 import ru.practicum.comments.service.CommentService;
 
@@ -20,9 +22,18 @@ import java.time.LocalDateTime;
 @Validated
 @RequiredArgsConstructor
 @Slf4j
-public class CommentController {
+public class UserCommentController {
 
     private final CommentService commentService;
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<CommentPagedDto> getCommentsByEvent(
+            @PathVariable Long eventId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "NEWEST") CommentsOrder sort) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getComments(eventId, page, size, sort));
+    }
 
     @PostMapping("/{eventId}")
     public ResponseEntity<CommentOutputDto> addComment(@PathVariable

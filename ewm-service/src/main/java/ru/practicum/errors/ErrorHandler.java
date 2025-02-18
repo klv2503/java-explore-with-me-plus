@@ -60,6 +60,11 @@ public class ErrorHandler {
         return buildErrorResponse(e, HttpStatus.NOT_FOUND, "Event is not available.");
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Incorrect arguments.");
+    }
+
     @ExceptionHandler
     public ResponseEntity<ApiError> handlerOtherException(final Exception e) {
         return buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, "Got 500 status Internal server error");
