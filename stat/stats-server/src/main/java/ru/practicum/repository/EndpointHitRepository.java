@@ -6,14 +6,14 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
+import ru.practicum.dto.TakeHitsDto;
 import ru.practicum.dto.ReadEndpointHitDto;
 import ru.practicum.model.EndpointHit;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 @Slf4j
@@ -39,14 +39,13 @@ public class EndpointHitRepository {
         jdbc.update(sql, params);
     }
 
-    public Collection<ReadEndpointHitDto> get(LocalDateTime start, LocalDateTime end, Optional<List<String>> mayBeUris,
-                                              boolean unique) {
+    public Collection<ReadEndpointHitDto> get(TakeHitsDto takeHitsDto) {
         StringBuilder sql = new StringBuilder();
         MapSqlParameterSource params = new MapSqlParameterSource();
 
         sql.append("SELECT ");
 
-        if (unique) {
+        if (takeHitsDto.isUnique()) {
             sql.append(" app, uri, COUNT(distinct ip) as count, ip FROM endpoint_hit WHERE timestamp BETWEEN :start AND :end " +
                     "GROUP BY app, uri, ip");
         } else {
@@ -54,11 +53,11 @@ public class EndpointHitRepository {
                     "GROUP BY app, uri, ip");
         }
 
-        params.addValue("start", start);
-        params.addValue("end", end);
+        params.addValue("start", takeHitsDto.getStart());
+        params.addValue("end", takeHitsDto.getEnd());
 
-        if (mayBeUris.isPresent()) {
-            List<String> uris = mayBeUris.get();
+        if (!CollectionUtils.isEmpty(takeHitsDto.getUris())) {
+            List<String> uris = takeHitsDto.getUris();
             StringBuilder urisString = new StringBuilder(uris.getFirst());
 
             for (int i = 1; i < uris.size(); i++) {
@@ -71,4 +70,29 @@ public class EndpointHitRepository {
 
         return jdbc.query(sql.toString(), params, mapper);
     }
+
+    public void saveAll(List<EndpointHit> listHits) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO endpoint_hit (app, uri, ip, timestamp) VALUES ");
+
+        int lastIndex = listHits.size() - 1;
+        for (var i = 0; i < lastIndex; i++) {
+            String val = "(:app" + i + ", :uri" + i + ", :ip" + i + ", :timestamp" + i + "), ";
+            sql.append(val);
+        }
+
+        sql.append("(:app" + lastIndex + ", :uri" + lastIndex + ", :ip" + lastIndex + ", :timestamp" + lastIndex + ");");
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+
+        for (var i = 0; i <= lastIndex; i++) {
+            params.addValue("app" + i, listHits.get(i).getApp());
+            params.addValue("uri" + i, listHits.get(i).getUri());
+            params.addValue("ip" + i, listHits.get(i).getIp());
+            params.addValue("timestamp" + i, Timestamp.valueOf(listHits.get(i).getTimestamp()));
+        }
+
+        jdbc.update(sql.toString(), params);
+    }
+
 }

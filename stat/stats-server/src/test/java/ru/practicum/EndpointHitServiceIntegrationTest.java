@@ -9,12 +9,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.controller.StatsController;
 import ru.practicum.dto.ReadEndpointHitDto;
+import ru.practicum.dto.TakeHitsDto;
 import ru.practicum.service.EndpointHitService;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,8 +38,13 @@ public class EndpointHitServiceIntegrationTest {
 
     @Test
     public void getHitsWithoutUniqueAndUris() {
-        Collection<ReadEndpointHitDto> dtoList = endpointHitService.getHits(start, end,
-                Optional.empty(), false);
+        TakeHitsDto takeHitsDto = TakeHitsDto.builder()
+                .start(start)
+                .end(end)
+                .uris(List.of())
+                .unique(false)
+                .build();
+        Collection<ReadEndpointHitDto> dtoList = endpointHitService.getHits(takeHitsDto);
 
         assertAll(
                 () -> assertEquals(3, dtoList.size())
@@ -48,8 +53,13 @@ public class EndpointHitServiceIntegrationTest {
 
     @Test
     public void getHitsWithUnique() {
-        Collection<ReadEndpointHitDto> dtoList = endpointHitService.getHits(start, end,
-                Optional.empty(), true);
+        TakeHitsDto takeHitsDto = TakeHitsDto.builder()
+                .start(start)
+                .end(end)
+                .uris(List.of())
+                .unique(true)
+                .build();
+        Collection<ReadEndpointHitDto> dtoList = endpointHitService.getHits(takeHitsDto);
 
         assertAll(
                 () -> assertEquals(3, dtoList.size())
@@ -59,9 +69,13 @@ public class EndpointHitServiceIntegrationTest {
     @Test
     public void getHitsWithUris() {
         List<String> uris = List.of("/events");
-
-        Collection<ReadEndpointHitDto> dtoList = endpointHitService.getHits(start, end,
-                Optional.of(uris), false);
+        TakeHitsDto takeHitsDto = TakeHitsDto.builder()
+                .start(start)
+                .end(end)
+                .uris(uris)
+                .unique(false)
+                .build();
+        Collection<ReadEndpointHitDto> dtoList = endpointHitService.getHits(takeHitsDto);
 
         assertAll(
                 () -> assertEquals(1, dtoList.size())
@@ -71,9 +85,14 @@ public class EndpointHitServiceIntegrationTest {
     @Test
     public void getHitsWithUrisAndUnique() {
         List<String> uris = List.of("/events/1");
+        TakeHitsDto takeHitsDto = TakeHitsDto.builder()
+                .start(start)
+                .end(end)
+                .uris(uris)
+                .unique(true)
+                .build();
 
-        Collection<ReadEndpointHitDto> dtoList = endpointHitService.getHits(start, end,
-                Optional.of(uris), true);
+        Collection<ReadEndpointHitDto> dtoList = endpointHitService.getHits(takeHitsDto);
 
         assertAll(
                 () -> assertEquals(1, dtoList.size()),
