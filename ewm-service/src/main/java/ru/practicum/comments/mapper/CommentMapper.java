@@ -2,38 +2,37 @@ package ru.practicum.comments.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.comments.dto.CommentDto;
-import ru.practicum.comments.dto.CommentOutputDto;
+import ru.practicum.comments.dto.CommentOutDto;
 import ru.practicum.comments.model.Comment;
-import ru.practicum.events.mapper.EventMapper;
+import ru.practicum.comments.model.CommentsStatus;
+import ru.practicum.config.DateConfig;
 import ru.practicum.events.model.Event;
 import ru.practicum.users.model.User;
+
+import java.time.LocalDateTime;
 
 @Component
 public class CommentMapper {
 
-    public static Comment commentDtoToComment(CommentDto commentDto) {
-//Возможно, так надо строить сразу CommentDto - надо подумать
+    public static Comment dtoToComment(CommentDto commentDto, User user, Event event) {
         return Comment.builder()
-                .user(User.builder()
-                        .id(commentDto.getUserId())
-                        .build())
-                .event(Event.builder()
-                        .id(commentDto.getEventId())
-                        .build())
+                .id(commentDto.getId())
+                .user(user)
+                .event(event)
                 .text(commentDto.getText())
-                .created(commentDto.getCreated())
-                .status(commentDto.getStatus())
+                .created(LocalDateTime.now())
+                .status(CommentsStatus.PUBLISHED)
                 .build();
     }
 
-    public static CommentOutputDto commentToOutputDto(Comment comment) {
-        return CommentOutputDto.builder()
+    public static CommentOutDto commentToOutDto(Comment comment) {
+        return CommentOutDto.builder()
                 .id(comment.getId())
-                .user(comment.getUser())
-                .event(EventMapper.toEventShortDto(comment.getEvent()))
                 .text(comment.getText())
-                .created(comment.getCreated())
-                .status(comment.getStatus())
+                .authorName(comment.getUser().getName())
+                .eventName(comment.getEvent().getTitle())
+                .created(comment.getCreated().toString())
+                .status(comment.getStatus().toString())
                 .build();
     }
 }
