@@ -4,15 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.comments.model.CommentsStatus;
-
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentDto {
+@Builder
+public class CommentOutDto {
     private Long id;
-    private Long eventId;
     private String text;
+    private String eventName;
+    private String authorName;
+    private String created;
+    private String status;
 }
