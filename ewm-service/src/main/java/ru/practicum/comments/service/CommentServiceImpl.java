@@ -16,7 +16,7 @@ import ru.practicum.comments.model.Comment;
 import ru.practicum.comments.model.CommentsOrder;
 import ru.practicum.comments.model.CommentsStatus;
 import ru.practicum.comments.repository.CommentRepository;
-import ru.practicum.events.model.Event;
+import ru.practicum.errors.ForbiddenActionException;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.service.PublicEventsService;
 import ru.practicum.users.service.AdminUserService;
@@ -72,7 +72,6 @@ public class CommentServiceImpl implements CommentService {
                 .build();
     }
 
-
     @Override
     @Transactional
     public CommentOutputDto addComment(CommentDto commentDto) {
@@ -80,5 +79,22 @@ public class CommentServiceImpl implements CommentService {
         comment.setUser(adminUserService.getUser(comment.getUser().getId()));
         comment.setEvent(publicEventsService.getEventAnyStatusWithViews(comment.getEvent().getId()));
         return CommentMapper.commentToOutputDto(commentRepository.save(comment));
+    }
+
+    @Override
+    @Transactional
+    public CommentOutputDto updateComment(Long userId, Long commentId, String text) {
+        Comment comment = getComment(commentId);
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new ForbiddenActionException("User " + userId + "can't edit this comment.");
+        }
+        comment.setText(text);
+        return CommentMapper.commentToOutputDto(commentRepository.save(comment));
+    }
+
+    @Override
+    public Comment getComment(Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Comment with " + id + " not found"));
     }
 }

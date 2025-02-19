@@ -54,4 +54,13 @@ public class UserCommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdComment);
 
     }
+
+    @PatchMapping("/commentId")
+    public ResponseEntity<CommentOutputDto> updateComment(@PathVariable
+                                                          @Min(value = 1, message = "ID must be positive") Long userId,
+                                                          @PathVariable
+                                                          @Min(value = 1, message = "ID must be positive") Long commentId,
+                                                          @RequestBody @NotBlank String text) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(userId, commentId, text));
+    }
 }
