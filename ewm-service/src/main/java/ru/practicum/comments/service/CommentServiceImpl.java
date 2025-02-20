@@ -18,6 +18,7 @@ import ru.practicum.comments.model.CommentsOrder;
 import ru.practicum.comments.model.CommentsStatus;
 import ru.practicum.comments.repository.CommentRepository;
 import ru.practicum.errors.AccessDeniedException;
+import ru.practicum.errors.ForbiddenActionException;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.service.PublicEventsService;
 import ru.practicum.users.service.AdminUserService;
@@ -102,5 +103,31 @@ public class CommentServiceImpl implements CommentService {
     public Comment getComment(Long id) {
         return commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Comment with " + id + " not found"));
+    }
+
+    @Override
+    public void softDelete(Long userId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId +
+                        " not found"));
+
+        if (!comment.getUser().getId().equals(userId)) {
+            new AccessDeniedException("Not enough rights");
+        }
+
+        comment.setStatus(CommentsStatus.DELETED);
+        commentRepository.save(comment);
+    }
+
+    @Override
+    public void deleteById(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId + " not found"));
+
+        if (!comment.getStatus().equals(CommentsStatus.PUBLISHED)) {
+            commentRepository.deleteById(commentId);
+        } else {
+            throw new ForbiddenActionException("The comment's status doesn't allow it to be deleted");
+        }
     }
 }
