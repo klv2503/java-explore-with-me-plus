@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.comments.service.CommentService;
 
-import java.time.LocalDateTime;
-
 @RestController
 @RequestMapping("/admin/comments")
 @RequiredArgsConstructor

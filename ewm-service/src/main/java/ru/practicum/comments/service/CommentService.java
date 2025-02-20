@@ -6,8 +6,6 @@ import ru.practicum.comments.dto.CommentPagedDto;
 import ru.practicum.comments.model.Comment;
 import ru.practicum.comments.model.CommentsOrder;
 
-import java.time.LocalDateTime;
-
 public interface CommentService {
 
     CommentPagedDto getComments(Long eventId, int page, int size, CommentsOrder sort);
