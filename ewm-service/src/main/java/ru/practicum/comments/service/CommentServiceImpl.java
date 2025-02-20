@@ -17,7 +17,7 @@ import ru.practicum.comments.model.Comment;
 import ru.practicum.comments.model.CommentsOrder;
 import ru.practicum.comments.model.CommentsStatus;
 import ru.practicum.comments.repository.CommentRepository;
-import ru.practicum.errors.ForbiddenActionException;
+import ru.practicum.errors.AccessDeniedException;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.service.PublicEventsService;
 import ru.practicum.users.service.AdminUserService;
@@ -92,7 +92,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentEconomDto updateComment(Long userId, Long commentId, String text) {
         Comment comment = getComment(commentId);
         if (!comment.getUser().getId().equals(userId)) {
-            throw new ForbiddenActionException("User " + userId + "can't edit this comment.");
+            throw new AccessDeniedException("User " + userId + "can't edit this comment.");
         }
         comment.setText(text);
         return CommentMapper.commentToEconomDto(commentRepository.save(comment));

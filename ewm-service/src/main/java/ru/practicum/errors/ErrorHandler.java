@@ -35,6 +35,11 @@ public class ErrorHandler {
         return buildErrorResponse(e, HttpStatus.BAD_REQUEST, "Missing required parameter");
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDeniedException(final AccessDeniedException e) {
+        return buildErrorResponse(e, HttpStatus.FORBIDDEN, "Access denied");
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiError> handlerEntityNotFoundException(final EntityNotFoundException e) {
         return buildErrorResponse(e, HttpStatus.NOT_FOUND, "The required object was not found.");
@@ -47,7 +52,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(ForbiddenActionException.class)
     public ResponseEntity<ApiError> handlerForbiddenActionException(final ForbiddenActionException e) {
-        return buildErrorResponse(e, HttpStatus.FORBIDDEN, "Action not allowed.");
+        return buildErrorResponse(e, HttpStatus.CONFLICT, "Action not allowed.");
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
