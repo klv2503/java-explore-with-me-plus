@@ -45,6 +45,6 @@ public class UserCommentController {
     ResponseEntity<Void> softDelete(@PathVariable Long userId, @PathVariable Long commentId) {
         log.info("Request for soft delete comment with id {} by user with id {}", commentId, userId);
         commentService.softDelete(userId, commentId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
