@@ -47,7 +47,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(ForbiddenActionException.class)
     public ResponseEntity<ApiError> handlerForbiddenActionException(final ForbiddenActionException e) {
-        return buildErrorResponse(e, HttpStatus.CONFLICT, "Action not allowed.");
+        return buildErrorResponse(e, HttpStatus.FORBIDDEN, "Action not allowed.");
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

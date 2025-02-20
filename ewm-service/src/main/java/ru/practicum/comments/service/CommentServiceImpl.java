@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.comments.dto.CommentDto;
+import ru.practicum.comments.dto.CommentEconomDto;
 import ru.practicum.comments.dto.CommentOutputDto;
 import ru.practicum.comments.dto.CommentPagedDto;
 import ru.practicum.comments.mapper.CommentMapper;
@@ -21,6 +22,7 @@ import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.service.PublicEventsService;
 import ru.practicum.users.service.AdminUserService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,22 +76,26 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentOutputDto addComment(CommentDto commentDto) {
-        Comment comment = CommentMapper.commentDtoToComment(commentDto);
-        comment.setUser(adminUserService.getUser(comment.getUser().getId()));
-        comment.setEvent(publicEventsService.getEventAnyStatusWithViews(comment.getEvent().getId()));
-        return CommentMapper.commentToOutputDto(commentRepository.save(comment));
+    public CommentEconomDto addComment(Long userId, CommentDto commentDto) {
+        Comment comment = Comment.builder()
+                .user(adminUserService.getUser(userId))
+                .event(publicEventsService.getEventAnyStatusWithViews(commentDto.getEventId()))
+                .text(commentDto.getText())
+                .created(LocalDateTime.now())
+                .status(CommentsStatus.PUBLISHED)
+                .build();
+        return CommentMapper.commentToEconomDto(commentRepository.save(comment));
     }
 
     @Override
     @Transactional
-    public CommentOutputDto updateComment(Long userId, Long commentId, String text) {
+    public CommentEconomDto updateComment(Long userId, Long commentId, String text) {
         Comment comment = getComment(commentId);
         if (!comment.getUser().getId().equals(userId)) {
             throw new ForbiddenActionException("User " + userId + "can't edit this comment.");
         }
         comment.setText(text);
-        return CommentMapper.commentToOutputDto(commentRepository.save(comment));
+        return CommentMapper.commentToEconomDto(commentRepository.save(comment));
     }
 
     @Override

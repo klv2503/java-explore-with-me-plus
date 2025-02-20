@@ -1,191 +1,173 @@
 {
-	"info": {
-		"_postman_id": "371623df-7420-43c1-8732-95c570bf1488",
-		"name": "Comments Test",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "38503251"
-	},
-	"item": [
-		{
-			"name": "Добавление нового комментария",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const main = async () => {\r",
-							"    const rnd = {\r",
-							"        getUser: () => ({\r",
-							"            name: \"Test User\",\r",
-							"            email: `testuser${Math.floor(Math.random() * 10000)}@example.com`,\r",
-							"            password: \"password123\"\r",
-							"        }),\r",
-							"        getCategory: () => ({\r",
-							"            name: `Test Category ${Math.floor(Math.random() * 10000)}`\r",
-							"        }),\r",
-							"        getEvent: (categoryId) => ({\r",
-							"            title: \"Test Event\",\r",
-							"            annotation: \"This is a test event\",\r",
-							"            description: \"Detailed description of the test event\",\r",
-							"            category: categoryId,\r",
-							"            eventDate: \"2026-10-11 23:10:05\",\r",
-							"            location: { lat: 55.751244, lon: 37.618423 },\r",
-							"            paid: true,\r",
-							"            participantLimit: 10,\r",
-							"            requestModeration: false\r",
-							"        })\r",
-							"    };\r",
-							"\r",
-							"    try {\r",
-							"        // Создаем пользователя\r",
-							"        const userResponse = await pm.sendRequest({\r",
-							"            url: 'http://localhost:8080/admin/users', // Замените на ваш URL\r",
-							"            method: 'POST',\r",
-							"            header: { 'Content-Type': 'application/json' },\r",
-							"            body: {\r",
-							"                mode: 'raw',\r",
-							"                raw: JSON.stringify(rnd.getUser())\r",
-							"            }\r",
-							"        });\r",
-							"        const user = userResponse.json();\r",
-							"        console.log(\"User created:\", user);\r",
-							"\r",
-							"        // Создаем категорию\r",
-							"        const categoryResponse = await pm.sendRequest({\r",
-							"            url: 'http://localhost:8080/admin/categories', // Замените на ваш URL\r",
-							"            method: 'POST',\r",
-							"            header: { 'Content-Type': 'application/json' },\r",
-							"            body: {\r",
-							"                mode: 'raw',\r",
-							"                raw: JSON.stringify(rnd.getCategory())\r",
-							"            }\r",
-							"        });\r",
-							"        const category = categoryResponse.json();\r",
-							"        console.log(\"Category created:\", category);\r",
-							"\r",
-							"        // Создаем событие\r",
-							"        let eventBody = rnd.getEvent(category.id);\r",
-							"        eventBody['requestModeration'] = true;\r",
-							"        eventBody['participantLimit'] = 0;\r",
-							"        const eventResponse = await pm.sendRequest({\r",
-							"            url: `http://localhost:8080/users/${user.id}/events`, // Замените на ваш URL\r",
-							"            method: 'POST',\r",
-							"            header: { 'Content-Type': 'application/json' },\r",
-							"            body: {\r",
-							"                mode: 'raw',\r",
-							"                raw: JSON.stringify(eventBody)\r",
-							"            }\r",
-							"        });\r",
-							"        let event = eventResponse.json();\r",
-							"        console.log(\"Event created:\", event);\r",
-							"\r",
-							"        // Создаем второго пользователя (автора комментария)\r",
-							"        const submittedUserResponse = await pm.sendRequest({\r",
-							"            url: 'http://localhost:8080/admin/users', // Замените на ваш URL\r",
-							"            method: 'POST',\r",
-							"            header: { 'Content-Type': 'application/json' },\r",
-							"            body: {\r",
-							"                mode: 'raw',\r",
-							"                raw: JSON.stringify(rnd.getUser())\r",
-							"            }\r",
-							"        });\r",
-							"        const submittedUser = submittedUserResponse.json();\r",
-							"        console.log(\"Submitted user created:\", submittedUser);\r",
-							"\r",
-							"        // Сохраняем данные в переменные коллекции\r",
-							"        pm.collectionVariables.set('userId', submittedUser.id);\r",
-							"        pm.collectionVariables.set('eventId', event.id);\r",
-							"        pm.collectionVariables.set('commentText', \"This is a test comment\");\r",
-							"\r",
-							"        console.log(\"Test data preparation completed.\");\r",
-							"    } catch (err) {\r",
-							"        console.error(\"Ошибка при подготовке тестовых данных:\", err);\r",
-							"    }\r",
-							"};\r",
-							"\r",
-							"// Запускаем подготовку данных\r",
-							"main();"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Статус код 201\", function () {\r",
-							"    pm.response.to.have.status(201);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Корректный ответ сервера\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData).to.have.property('id');\r",
-							"    pm.expect(jsonData).to.have.property('text');\r",
-							"    pm.expect(jsonData).to.have.property('eventName');\r",
-							"    pm.expect(jsonData).to.have.property('authorName');\r",
-							"    pm.expect(jsonData).to.have.property('created');\r",
-							"    pm.expect(jsonData).to.have.property('status');\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"eventId\": {{eventId}},\r\n    \"text\": \"{{commentText}}\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/comments/{{userId}}/{{eventId}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"comments",
-						"{{userId}}",
-						"{{eventId}}"
-					],
-					"query": [
-						{
-							"key": "userId",
-							"value": "1",
-							"disabled": true
-						},
-						{
-							"key": "eventId",
-							"value": "1",
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"variable": [
-		{
-			"key": "userId",
-			"value": ""
-		},
-		{
-			"key": "eventId",
-			"value": ""
-		},
-		{
-			"key": "commentText",
-			"value": ""
-		}
-	]
+  "info": {
+    "name": "Test Scenario",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create User1",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/admin/users", "host": [ "{{base_url}}" ], "path": [ "admin", "users" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"User1\", \"email\": \"user1@example.com\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Создан user1 - статус 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var user1 = pm.response.json();",
+              "pm.environment.set(\"user1_id\", user1.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create User2",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/admin/users", "host": [ "{{base_url}}" ], "path": [ "admin", "users" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"User2\", \"email\": \"user2@example.com\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Создан user2 - статус 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var user2 = pm.response.json();",
+              "pm.environment.set(\"user2_id\", user2.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Category",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/admin/categories", "host": [ "{{base_url}}" ], "path": [ "admin", "categories" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"Test Category\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Создана категория - статус 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var category = pm.response.json();",
+              "pm.environment.set(\"category_id\", category.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/users/{{user1_id}}/events", "host": [ "{{base_url}}" ], "path": [ "users", "{{user1_id}}", "events" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"annotation\":\"Test Annotation for Commented Event\", \"category\":{{category_id}}, \"description\":\"Test Description for Commented Event\", \"eventDate\":\"2025-02-25 19:21:57\", \"location\":{\"lat\":-67.072, \"lon\":83.6998}, \"paid\":false, \"participantLimit\":2, \"requestModeration\":true, \"title\":\"Test Event\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Создан event - статус 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var event = pm.response.json();",
+              "pm.environment.set(\"event_id\", event.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Publish Event",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/admin/events/{{event_id}}", "host": [ "{{base_url}}" ], "path": [ "admin", "events", "{{event_id}}" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"stateAction\":\"PUBLISH_EVENT\"}"
+        }
+      }
+    },
+    {
+      "name": "Create Comment",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/users/{{user2_id}}/comments", "host": [ "{{base_url}}" ], "path": [ "users", "{{user2_id}}", "comments" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"eventId\": {{event_id}}, \"text\": \"Отличное событие!\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Создан комментарий - статус 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var comment = pm.response.json();",
+              "console.log(\"Комментарий создан: \" + comment.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
 }
