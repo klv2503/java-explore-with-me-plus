@@ -11,8 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.comments.dto.CommentDto;
 import ru.practicum.comments.dto.CommentEconomDto;
-import ru.practicum.comments.dto.CommentPagedDto;
-import ru.practicum.comments.model.CommentsOrder;
 import ru.practicum.comments.service.CommentService;
 
 @RestController
