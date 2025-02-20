@@ -35,6 +35,11 @@ public class ErrorHandler {
         return buildErrorResponse(e, HttpStatus.BAD_REQUEST, "Missing required parameter");
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDeniedException(final AccessDeniedException e) {
+        return buildErrorResponse(e, HttpStatus.FORBIDDEN, "Access denied");
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiError> handlerEntityNotFoundException(final EntityNotFoundException e) {
         return buildErrorResponse(e, HttpStatus.NOT_FOUND, "The required object was not found.");
@@ -58,6 +63,11 @@ public class ErrorHandler {
     @ExceptionHandler(EventNotPublishedException.class)
     public ResponseEntity<ApiError> handlerForbiddenActionException(final EventNotPublishedException e) {
         return buildErrorResponse(e, HttpStatus.NOT_FOUND, "Event is not available.");
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Incorrect arguments.");
     }
 
     @ExceptionHandler

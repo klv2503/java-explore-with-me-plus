@@ -12,61 +12,6 @@
     }
   ],
   "paths": {
-    "/comments": {
-      "post": {
-        "summary": "Создать комментарий",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "eventId",
-                  "text"
-                ],
-                "properties": {
-                  "eventId": {
-                    "type": "integer",
-                    "format": "int64",
-                    "description": "ID события"
-                  },
-                  "text": {
-                    "type": "string",
-                    "minLength": 10,
-                    "maxLength": 2000,
-                    "description": "Текст комментария"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Комментарий создан",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Comment"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Ошибка валидации"
-          },
-          "401": {
-            "description": "Требуется авторизация"
-          }
-        }
-      }
-    },
     "/comments/{eventId}": {
       "get": {
         "summary": "Получить комментарии к событию",
@@ -124,20 +69,98 @@
             }
           },
           "400": {
-            "description": "Ошибка запроса"
+            "description": "Ошибка запроса или некорректные параметры"
+          },
+          "404": {
+            "description": "Событие не найдено"
           }
         }
       }
     },
-    "/comments/{commentId}": {
-      "patch": {
-        "summary": "Редактировать комментарий",
+    "/users/{userId}/comments": {
+      "post": {
+        "summary": "Создать комментарий от имени пользователя",
         "security": [
           {
             "bearerAuth": []
           }
         ],
         "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "eventId",
+                  "text"
+                ],
+                "properties": {
+                  "eventId": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "ID события"
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 10,
+                    "maxLength": 2000,
+                    "description": "Текст комментария"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Комментарий создан",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка валидации или некорректные данные"
+          },
+          "401": {
+            "description": "Требуется авторизация"
+          }
+        }
+      }
+    },
+    "/users/{userId}/comments/{commentId}": {
+      "patch": {
+        "summary": "Редактировать комментарий пользователя",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
           {
             "name": "commentId",
             "in": "path",
@@ -180,7 +203,7 @@
             }
           },
           "400": {
-            "description": "Ошибка валидации"
+            "description": "Ошибка валидации или некорректный запрос"
           },
           "403": {
             "description": "Доступ запрещён"
@@ -188,13 +211,22 @@
         }
       },
       "delete": {
-        "summary": "Удалить комментарий",
+        "summary": "Удалить комментарий пользователя",
         "security": [
           {
             "bearerAuth": []
           }
         ],
         "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
           {
             "name": "commentId",
             "in": "path",

@@ -127,6 +127,35 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         return tuplesToEvents(event, currentList);
     }
 
+    @Override
+    public Event getSingleEvent(Long id) {
+        QEvent event = QEvent.event;
+        QParticipationRequest participation = QParticipationRequest.participationRequest;
+
+        Tuple result = new JPAQuery<>(em)
+                .select(event, participation.id.count().coalesce(0L)) // Берем event и количество подтвержденных заявок
+                .from(event)
+                .leftJoin(participation).on(event.id.eq(participation.event.id)
+                        .and(participation.status.eq(ParticipationRequestStatus.CONFIRMED)))
+                .where(event.id.eq(id))
+                .groupBy(event.id)
+                .fetchOne();
+
+        if (result == null || result.get(event) == null) {
+            return null;
+        }
+
+        Event eventResult = result.get(event);
+        if (eventResult == null) {
+            return null;
+        }
+        Integer confirmedRequestsCount = result.get(participation.id.count().coalesce(0L).intValue());
+
+        eventResult.setConfirmedRequests((confirmedRequestsCount == null) ? 0 : confirmedRequestsCount);
+
+        return eventResult;
+    }
+
     private List<Event> tuplesToEvents(QEvent event, List<Tuple> tuples) {
         List<Event> events = new ArrayList<>();
         for (Tuple tuple : tuples) {
