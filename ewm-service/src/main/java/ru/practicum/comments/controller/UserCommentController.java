@@ -24,15 +24,6 @@ public class UserCommentController {
 
     private final CommentService commentService;
 
-    @GetMapping("/{eventId}")
-    public ResponseEntity<CommentPagedDto> getCommentsByEvent(
-            @PathVariable Long eventId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "NEWEST") CommentsOrder sort) {
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.getComments(eventId, page, size, sort));
-    }
-
     @PostMapping
     public ResponseEntity<CommentEconomDto> addComment(@PathVariable
                                                        @Min(value = 1, message = "ID must be positive") Long userId,
@@ -43,7 +34,7 @@ public class UserCommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdComment);
     }
 
-    @PatchMapping("/commentId")
+    @PatchMapping("/{commentId}")
     public ResponseEntity<CommentEconomDto> updateComment(@PathVariable
                                                           @Min(value = 1, message = "ID must be positive") Long userId,
                                                           @PathVariable
