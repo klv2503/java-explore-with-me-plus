@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest(properties = "classpath:application-test.properties",
         classes = MainService.class)
-//@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ExtendWith(SpringExtension.class)
 @Transactional(readOnly = true)
 @Slf4j
