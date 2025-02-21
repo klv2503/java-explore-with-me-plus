@@ -15,4 +15,8 @@ public interface CommentService {
     CommentEconomDto updateComment(Long userId, Long commentId, String text);
 
     Comment getComment(Long id);
+
+    void softDelete(Long userId, Long commentId);
+
+    void deleteById(Long commentId);
 }
