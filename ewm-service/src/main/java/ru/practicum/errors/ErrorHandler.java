@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,6 +34,20 @@ public class ErrorHandler {
     public ResponseEntity<ApiError>
     handleMissingServletRequestParameterException(final MissingServletRequestParameterException e) {
         return buildErrorResponse(e, HttpStatus.BAD_REQUEST, "Missing required parameter");
+    }
+
+    @ExceptionHandler(MissingPathVariableException.class)
+    public ResponseEntity<ApiError> handleMissingPathVariableException(final MissingPathVariableException e) {
+        String message;
+        HttpStatus status;
+        if (e.getVariableName().equals("userId")) {
+            message = "Authorisation is required.";
+            status = HttpStatus.UNAUTHORIZED;
+        } else {
+            message = e.getVariableName() + "was missed.";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return buildErrorResponse(e, status, message);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -78,7 +93,7 @@ public class ErrorHandler {
     private ResponseEntity<ApiError> buildErrorResponse(Exception e, HttpStatus status, String message) {
         StackTraceElement sElem = e.getStackTrace()[0];
         String className = sElem.getClassName();
-        String str = className.substring(className.lastIndexOf(".") + 1);
+        String str = className.contains(".") ? className.substring(className.lastIndexOf(".") + 1) : className;
         log.error("\n{} error - Class: {}; Method: {}; Line: {}; \nMessage: {}",
                 status, str, sElem.getMethodName(), sElem.getLineNumber(), e.getMessage());
 

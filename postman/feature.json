@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "Test Scenario",
+    "name": "Test Comments",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -107,10 +107,239 @@
         "url": { "raw": "{{base_url}}/users/{{user1_id}}/events", "host": [ "{{base_url}}" ], "path": [ "users", "{{user1_id}}", "events" ] },
         "body": {
           "mode": "raw",
-          "raw": "{\"annotation\":\"Test Annotation for Commented Event\", \"category\":{{category_id}}, \"description\":\"Test Description for Commented Event\", \"eventDate\":\"2025-02-25 19:21:57\", \"location\":{\"lat\":-67.072, \"lon\":83.6998}, \"paid\":false, \"participantLimit\":2, \"requestModeration\":true, \"title\":\"Test Event\"}"
+          "raw": "{\"annotation\":\"Test Annotation for Commented Event\", \"category\":{{category_id}}, \"description\":\"Test Description for Commented Event\", \"eventDate\":\"{{eventDate}}\", \"location\":{\"lat\":-67.072, \"lon\":83.6998}, \"paid\":false, \"participantLimit\":2, \"requestModeration\":true, \"title\":\"Test Event\"}"
         }
       },
       "event": [
+        {
+         "listen": "prerequest",
+         "script": {
+           "exec": [
+            "let currentDate = new Date();",
+            "currentDate.setDate(currentDate.getDate() + 1);",
+            "let formattedDate = currentDate.toISOString().replace('T', ' ').substring(0, 19);",
+            "pm.environment.set(\"eventDate\", formattedDate);"
+           ],
+           "type": "text/javascript"
+         }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Создан event - статус 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var event = pm.response.json();",
+              "pm.environment.set(\"event_id\", event.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Comment with Unpublished Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/users/{{user2_id}}/comments", "host": [ "{{base_url}}" ], "path": [ "users", "{{user2_id}}", "comments" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"eventId\": {{event_id}}, \"text\": \"Попытка оставить комментарий к неопубликованному событию\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ошибка 404 при попытке создать комментарий к неопубликованному событию\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Publish Event",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/admin/events/{{event_id}}", "host": [ "{{base_url}}" ], "path": [ "admin", "events", "{{event_id}}" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"stateAction\":\"PUBLISH_EVENT\"}"
+        }
+      }
+    },
+    {
+      "name": "Create Comment with Invalid Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/users/{{user2_id}}/comments", "host": [ "{{base_url}}" ], "path": [ "users", "{{user2_id}}", "comments" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"eventId\": 999999, \"text\": \"Попытка оставить комментарий к несуществующему событию\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ошибка 404 при попытке создать комментарий к несуществующему событию\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Comment",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/users/{{user2_id}}/comments", "host": [ "{{base_url}}" ], "path": [ "users", "{{user2_id}}", "comments" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"eventId\": {{event_id}}, \"text\": \"Отличное событие!\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Статус ответа 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "pm.test(\"Ответ в формате JSON\", function () {",
+              "    pm.response.to.have.header('Content-Type', 'application/json');",
+              "});",
+              "pm.test(\"Ответ содержит необходимые поля\", function () {",
+              "    var jsonResponse = pm.response.json();",
+              "    pm.expect(jsonResponse).to.have.property('id');",
+              "    pm.expect(jsonResponse).to.have.property('userId', pm.environment.get(\"user2_id\"));",
+              "    pm.expect(jsonResponse).to.have.property('eventId', pm.environment.get(\"event_id\"));",
+              "    pm.expect(jsonResponse.text).to.eql(\"Отличное событие!\");",
+              "    pm.expect(jsonResponse).to.have.property('created').that.is.not.null;",
+              "    pm.expect(jsonResponse.status).to.eql(\"PUBLISHED\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create User3",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/admin/users", "host": [ "{{base_url}}" ], "path": [ "admin", "users" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"User3\", \"email\": \"user3@example.com\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var user3 = pm.response.json();",
+              "pm.environment.set(\"user3_id\", user3.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Category",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/admin/categories", "host": [ "{{base_url}}" ], "path": [ "admin", "categories" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"Second Test Category\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var category = pm.response.json();",
+              "pm.environment.set(\"category_id\", category.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/users/{{user1_id}}/events", "host": [ "{{base_url}}" ], "path": [ "users", "{{user1_id}}", "events" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"annotation\":\"{{annotation}}\", \"category\":{{category_id}}, \"description\":\"{{description}}\", \"eventDate\":\"{{eventDate}}\", \"location\":{\"lat\":{{lat}}, \"lon\":{{lon}}}, \"paid\":false, \"participantLimit\":2, \"requestModeration\":true, \"title\":\"Test Event\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "let currentDate = new Date();",
+              "currentDate.setDate(currentDate.getDate() + 1);",
+              "let formattedDate = currentDate.toISOString().replace('T', ' ').substring(0, 19);",
+              "pm.environment.set(\"eventDate\", formattedDate);",
+              "function generateRandomString(length) {",
+              "  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';",
+              "  let result = '';",
+              "  const charactersLength = characters.length;",
+              "  for (let i = 0; i < length; i++) {",
+              "    result += characters.charAt(Math.floor(Math.random() * charactersLength));",
+              "  }",
+              "  return result;",
+              "}",
+              "let annotationLength = Math.floor(Math.random() * (30 - 25 + 1)) + 25;",
+              "let descriptionLength = Math.floor(Math.random() * (30 - 25 + 1)) + 25;",
+              "pm.environment.set('annotation', generateRandomString(annotationLength));",
+              "pm.environment.set('description', generateRandomString(descriptionLength));",
+              "let lat = (Math.random() * 180 - 90).toFixed(6);",
+              "let lon = (Math.random() * 360 - 180).toFixed(6);",
+              "pm.environment.set('lat', lat);",
+              "pm.environment.set('lon', lon);"
+            ],
+            "type": "text/javascript"
+          }
+        },
         {
           "listen": "test",
           "script": {
@@ -147,7 +376,7 @@
         "header": [
           { "key": "Content-Type", "value": "application/json" }
         ],
-        "url": { "raw": "{{base_url}}/users/{{user2_id}}/comments", "host": [ "{{base_url}}" ], "path": [ "users", "{{user2_id}}", "comments" ] },
+        "url": { "raw": "{{base_url}}/users/{{user3_id}}/comments", "host": [ "{{base_url}}" ], "path": [ "users", "{{user3_id}}", "comments" ] },
         "body": {
           "mode": "raw",
           "raw": "{\"eventId\": {{event_id}}, \"text\": \"Отличное событие!\"}"
@@ -162,7 +391,76 @@
               "    pm.response.to.have.status(201);",
               "});",
               "var comment = pm.response.json();",
+              "pm.environment.set(\"comment_id\", comment.id);",
               "console.log(\"Комментарий создан: \" + comment.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Forbidden editing Comment",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/users/{{user2_id}}/comments/{{comment_id}}", "host": [ "{{base_url}}" ], "path": [ "users", "{{user2_id}}", "comments", "{{comment_id}}" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"text\": \"Text for forbidden updating\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Статус ответа 403\", function () {",
+              "    pm.response.to.have.status(403);",
+              "});",
+              "pm.test(\"Ответ в формате JSON\", function () {",
+              "    pm.response.to.have.header('Content-Type', 'application/json');",
+              "});",
+              "pm.test(\"Ошибка доступа при попытке редактирования чужого комментария\", function () {",
+              "    var jsonResponse = pm.response.json();",
+              "    pm.expect(jsonResponse).to.have.property('message').that.is.a('string');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Edit Comment",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/users/{{user3_id}}/comments/{{comment_id}}", "host": [ "{{base_url}}" ], "path": [ "users", "{{user3_id}}", "comments", "{{comment_id}}" ] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"text\": \"Text for legal updating\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Comment updated 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Ответ в формате JSON\", function () {",
+              "    pm.response.to.have.header('Content-Type', 'application/json');",
+              "});",
+              "pm.test(\"Comment was successfully updated\", function () {",
+              "    var jsonResponse = pm.response.json();",
+              "    pm.expect(jsonResponse.text).to.eql(\"Text for legal updating\");",
+              "});"
             ],
             "type": "text/javascript"
           }

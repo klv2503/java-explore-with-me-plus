@@ -12,7 +12,7 @@ public interface CommentService {
 
     CommentEconomDto addComment(Long userId, CommentDto commentDto);
 
-    CommentEconomDto updateComment(Long userId, Long commentId, String text);
+    CommentEconomDto updateComment(CommentDto dto);
 
     Comment getComment(Long id);
 }
