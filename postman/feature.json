@@ -696,21 +696,21 @@
 							"let comment = jsonData.comments[0];",
 							"pm.test(\"Comment has required properties\", function () {",
 							"    pm.expect(comment).to.include.keys(\"id\", \"text\", \"created\", \"status\", \"user\", \"event\");",
-							"    pm.expect(comment.id).to.eql(1);",
-							"    pm.expect(comment.text).to.eql(\"Отличное событие!\");",
+							"    pm.expect(comment.id).to.eql(pm.environment.get(\"comment_id\"));",
+							"    pm.expect(comment.text).to.eql(\"Text for legal updating\");",
 							"    pm.expect(comment.status).to.eql(\"PUBLISHED\");",
 							"});",
 							"",
 							"// Проверяем основные свойства пользователя",
 							"pm.test(\"User has required properties\", function () {",
 							"    pm.expect(comment.user).to.include.keys(\"id\", \"name\", \"email\");",
-							"    pm.expect(comment.user.id).to.eql(2);",
+							"    pm.expect(comment.user.id).to.eql(pm.environment.get(\"user3_id\"));",
 							"});",
 							"",
 							"// Проверяем основные свойства события",
 							"pm.test(\"Event has required properties\", function () {",
 							"    pm.expect(comment.event).to.include.keys(\"id\", \"title\", \"category\", \"initiator\");",
-							"    pm.expect(comment.event.id).to.eql(1);",
+							"    pm.expect(comment.event.id).to.eql(pm.environment.get(\"event_id\"));",
 							"    pm.expect(comment.event.title).to.eql(\"Test Event\");",
 							"});"
 						],
@@ -745,13 +745,13 @@
 					"raw": "{\"text\": \"Text for legal updating\"}"
 				},
 				"url": {
-					"raw": "{{base_url}}/comments/1",
+					"raw": "{{base_url}}/comments/{{event_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"comments",
-						"1"
+						"{{event_id}}"
 					]
 				}
 			},
