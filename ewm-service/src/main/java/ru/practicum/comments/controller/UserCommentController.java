@@ -37,7 +37,6 @@ public class UserCommentController {
                                                           @Min(value = 1, message = "ID must be positive") Long commentId,
                                                           @RequestBody @Valid CommentDto dto) {
         log.info("UserCommentController: accepted userId {}, commentId {}, text{}", userId, commentId, dto);
-        dto.setUserId(userId);
         dto.setId(commentId);
         dto.setUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(dto));
