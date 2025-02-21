@@ -58,7 +58,7 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new EntityNotFoundException("Event with " + id + " not found"));
 
         Sort sortType = sort == CommentsOrder.NEWEST ?
-                Sort.by("created").descending() : Sort.by("created").ascending();
+                Sort.by("id").descending() : Sort.by("id").ascending();
 
         Pageable pageable = PageRequest.of(page - 1, size, sortType);
 
