@@ -5,14 +5,21 @@ import ru.practicum.comments.dto.CommentEconomDto;
 import ru.practicum.comments.dto.CommentOutputDto;
 import ru.practicum.comments.model.Comment;
 import ru.practicum.events.mapper.EventMapper;
+import ru.practicum.users.model.User;
 
 @Component
 public class CommentMapper {
 
     public static CommentOutputDto commentToOutputDto(Comment comment) {
+        User user = User.builder()
+                .id(comment.getUser().getId())
+                .email(comment.getUser().getEmail())
+                .name(comment.getUser().getName())
+                .build();
+
         return CommentOutputDto.builder()
                 .id(comment.getId())
-                .user(comment.getUser())
+                .user(user)
                 .event(EventMapper.toEventShortDto(comment.getEvent()))
                 .text(comment.getText())
                 .created(comment.getCreated())

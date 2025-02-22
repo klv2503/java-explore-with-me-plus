@@ -2,6 +2,7 @@ package ru.practicum.comments.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -57,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new EntityNotFoundException("Event with " + id + " not found"));
 
         Sort sortType = sort == CommentsOrder.NEWEST ?
-                Sort.by("created").descending() : Sort.by("created").ascending();
+                Sort.by("id").descending() : Sort.by("id").ascending();
 
         Pageable pageable = PageRequest.of(page - 1, size, sortType);
 
@@ -90,12 +92,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentEconomDto updateComment(Long userId, Long commentId, String text) {
-        Comment comment = getComment(commentId);
-        if (!comment.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("User " + userId + "can't edit this comment.");
+    public CommentEconomDto updateComment(CommentDto dto) {
+        Comment comment = getComment(dto.getId());
+        if (!comment.getUser().getId().equals(dto.getUserId())) {
+            throw new AccessDeniedException("User " + dto.getUserId() + "can't edit this comment.");
         }
-        comment.setText(text);
+        comment.setText(dto.getText());
+        log.info("CommentServiceImpl: Comment for update {}", comment);
         return CommentMapper.commentToEconomDto(commentRepository.save(comment));
     }
 

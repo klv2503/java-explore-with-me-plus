@@ -1,5 +1,6 @@
 package ru.practicum.comments.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,11 +14,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class CommentDto {
+    private Long id;
 
     private Long userId;
 
     private Long eventId;
 
+    @NotBlank
     private String text;
 
     private LocalDateTime created;
