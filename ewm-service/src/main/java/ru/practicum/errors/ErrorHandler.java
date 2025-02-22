@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -35,6 +36,25 @@ public class ErrorHandler {
         return buildErrorResponse(e, HttpStatus.BAD_REQUEST, "Missing required parameter");
     }
 
+    @ExceptionHandler(MissingPathVariableException.class)
+    public ResponseEntity<ApiError> handleMissingPathVariableException(final MissingPathVariableException e) {
+        String message;
+        HttpStatus status;
+        if (e.getVariableName().equals("userId")) {
+            message = "Authorisation is required.";
+            status = HttpStatus.UNAUTHORIZED;
+        } else {
+            message = e.getVariableName() + "was missed.";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return buildErrorResponse(e, status, message);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDeniedException(final AccessDeniedException e) {
+        return buildErrorResponse(e, HttpStatus.FORBIDDEN, "Access denied");
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiError> handlerEntityNotFoundException(final EntityNotFoundException e) {
         return buildErrorResponse(e, HttpStatus.NOT_FOUND, "The required object was not found.");
@@ -60,6 +80,11 @@ public class ErrorHandler {
         return buildErrorResponse(e, HttpStatus.NOT_FOUND, "Event is not available.");
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Incorrect arguments.");
+    }
+
     @ExceptionHandler
     public ResponseEntity<ApiError> handlerOtherException(final Exception e) {
         return buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, "Got 500 status Internal server error");
@@ -68,7 +93,7 @@ public class ErrorHandler {
     private ResponseEntity<ApiError> buildErrorResponse(Exception e, HttpStatus status, String message) {
         StackTraceElement sElem = e.getStackTrace()[0];
         String className = sElem.getClassName();
-        String str = className.substring(className.lastIndexOf(".") + 1);
+        String str = className.contains(".") ? className.substring(className.lastIndexOf(".") + 1) : className;
         log.error("\n{} error - Class: {}; Method: {}; Line: {}; \nMessage: {}",
                 status, str, sElem.getMethodName(), sElem.getLineNumber(), e.getMessage());
 

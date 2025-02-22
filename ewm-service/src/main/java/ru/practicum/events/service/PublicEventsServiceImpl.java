@@ -1,6 +1,7 @@
 package ru.practicum.events.service;
 
 import com.querydsl.core.BooleanBuilder;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -55,6 +56,20 @@ public class PublicEventsServiceImpl implements PublicEventsService {
                 LocalDateTime.now().format(DateConfig.FORMATTER), uris, true);
         log.info("\nPublicEventsServiceImpl.getEventsViews: res {}", res);
         return (CollectionUtils.isEmpty(res)) ? 0 : res.getFirst().getHits();
+    }
+
+    @Override
+    public Event getEventAnyStatusWithViews(Long id) {
+        //Attention: this method works without saving views!
+        Event event = eventRepository.getSingleEvent(id);
+        if (event == null) {
+                throw new EntityNotFoundException("Event with " + id + " not found");
+        }
+        if (!event.getState().equals(StateEvent.PUBLISHED)) {
+            throw new EventNotPublishedException("There is no published event id " + event.getId());
+        }
+        event.setViews(getEventsViews(event.getId(), event.getPublishedOn()));
+        return event;
     }
 
     public List<Event> getEventsByListIds(List<Long> ids) {

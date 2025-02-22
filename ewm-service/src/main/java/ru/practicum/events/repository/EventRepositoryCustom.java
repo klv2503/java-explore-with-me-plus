@@ -18,4 +18,6 @@ public interface EventRepositoryCustom {
 
     List<Event> findEventsWithConfirmedCount(List<Long> eventIds);
 
+    Event getSingleEvent(Long id);
+
 }
