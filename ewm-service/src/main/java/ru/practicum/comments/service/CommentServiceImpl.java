@@ -111,8 +111,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public void deleteById(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId + " not found"));
+        Comment comment = getComment(commentId);
 
         if (!comment.getStatus().equals(CommentsStatus.PUBLISHED)) {
             commentRepository.deleteById(commentId);
@@ -124,9 +123,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public void softDelete(Long userId, Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId +
-                        " not found"));
+        Comment comment = getComment(commentId);
 
         if (!comment.getUser().getId().equals(userId)) {
            throw new AccessDeniedException("Not enough rights");
